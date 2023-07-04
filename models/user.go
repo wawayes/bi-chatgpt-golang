@@ -4,11 +4,11 @@ package models
 type User struct {
 	Model
 
-	UserAccount  string `json:"userAccount" gorm:"userAccount"`
-	UserPassword string `json:"userPassword" gorm:"userPassword"`
-	UserName     string `json:"userName" gorm:"userName"`
-	UserAvatar   string `json:"userAvatar" gorm:"userAvatar"`
-	UserRole     string `json:"UserRole" gorm:"userRole"`
+	UserAccount  string `json:"userAccount" gorm:"column:userAccount"`
+	UserPassword string `json:"userPassword" gorm:"column:userPassword"`
+	UserName     string `json:"userName" gorm:"column:userName"`
+	UserAvatar   string `json:"userAvatar" gorm:"column:userAvatar"`
+	UserRole     string `json:"UserRole" gorm:"column:userRole"`
 }
 
 func (User) TableName() string {
