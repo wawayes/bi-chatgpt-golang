@@ -2,8 +2,6 @@ basePath: /api/v1
 definitions:
   models.User:
     properties:
-      UserRole:
-        type: string
       createTime:
         description: 创建时间
         type: string
@@ -21,6 +19,8 @@ definitions:
         type: string
       userPassword:
         type: string
+      userRole:
+        type: string
     type: object
   r.Response:
     properties:
@@ -29,6 +29,29 @@ definitions:
       data: {}
       msg:
         type: string
+    type: object
+  requests.UserLoginRequest:
+    properties:
+      userAccount:
+        type: string
+      userPassword:
+        type: string
+    type: object
+  requests.UserRegisterRequest:
+    properties:
+      checkPassword:
+        type: string
+      userAccount:
+        type: string
+      userPassword:
+        type: string
+    type: object
+  session.Session:
+    properties:
+      sessionID:
+        type: string
+      userInfo:
+        $ref: '#/definitions/models.User'
     type: object
 externalDocs:
   description: OpenAPI
@@ -52,25 +75,19 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 用户名
+      - description: 登录请求参数
         in: body
-        name: userAccount
+        name: loginRequest
         required: true
         schema:
-          type: string
-      - description: 密码
-        in: body
-        name: userPassword
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/requests.UserLoginRequest'
       produces:
       - application/json
       responses:
         "0":
           description: 成功
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/session.Session'
         "40002":
           description: 参数错误
           schema:
@@ -87,24 +104,12 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 用户名
+      - description: 注册请求参数
         in: body
-        name: userAccount
+        name: registerRequest
         required: true
         schema:
-          type: string
-      - description: 密码
-        in: body
-        name: userPassword
-        required: true
-        schema:
-          type: string
-      - description: 检查密码
-        in: body
-        name: checkPassword
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/requests.UserRegisterRequest'
       produces:
       - application/json
       responses:

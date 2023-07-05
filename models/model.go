@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+// Model 共有字段
+type Model struct {
+	ID          int64                 `json:"id" gorm:"primary_key"`                           // 主键ID
+	CreateTime  LocalTime             `json:"createTime" gorm:"column:createTime"`             // 创建时间
+	UpdatedTime LocalTime             `json:"updateTime" gorm:"column:updateTime"`             // 更新时间
+	IsDelete    soft_delete.DeletedAt `json:"isDelete" gorm:"column:isDelete;softDelete:flag"` // 删除时间
+}
+
 type LocalTime time.Time
 
 func (t *LocalTime) MarshalJSON() ([]byte, error) {
@@ -30,12 +38,4 @@ func (t *LocalTime) Scan(v interface{}) error {
 		return nil
 	}
 	return fmt.Errorf("can not convert %v to timestamp", v)
-}
-
-// Model 共有字段
-type Model struct {
-	ID          int64                 `gorm:"primary_key"`                              // 主键ID
-	CreateTime  LocalTime             `gorm:"column:createTime"`                        // 创建时间
-	UpdatedTime LocalTime             `gorm:"column:updateTime"`                        // 更新时间
-	IsDelete    soft_delete.DeletedAt `gorm:"column:isDelete;softDelete:flag" json:"-"` // 删除时间
 }

@@ -17,19 +17,18 @@ import (
 	"net/http"
 )
 
-// UserLogin godoc
+// Login godoc
 //
 //	@Summary	User Login
 //	@Produce	json
 //	@Tags		UserApi
-//	@Param		userAccount		body	string	true	"用户名"
-//	@Param		userPassword	body	string	true	"密码"
+//	@Param		loginRequest	body	requests.UserLoginRequest	true	"登录请求参数"
 //	@Accept		json
-//	@Success	0		{object}	models.User	"成功"
-//	@Failure	40002	{object}	r.Response	"参数错误"
-//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Success	0		{object}	session.Session	"成功"
+//	@Failure	40002	{object}	r.Response		"参数错误"
+//	@Failure	40003	{object}	r.Response		"系统错误"
 //	@Router		/login [post]
-func UserLogin(c *gin.Context) {
+func Login(c *gin.Context) {
 	userService := &service.UserService{}
 	var req requests.UserLoginRequest
 	validate := validator.New()
@@ -44,43 +43,42 @@ func UserLogin(c *gin.Context) {
 		log.Println(err.Error())
 		return
 	}
-	user, err := userService.UserLogin(&req)
+	user, err := userService.Login(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, r.SYSTEM_ERROR.WithMsg("登录失败:"+err.Error()))
 	} else {
-		c.JSON(http.StatusOK, r.OK.WithData(user))
-		if err != nil {
-			logx.Error("user信息解码失败")
-			panic(err)
-		}
+		// 将用户信息存入session
 		s := &session.Session{
 			SessionID: uuid.New(),
 			UserInfo:  *user,
 		}
-		logx.Info("用户登录成功")
 		err = s.Save(context.Background(), redis.Rdb)
 		if err != nil {
 			logx.Warning("登录信息存入session失败")
 			return
 		}
 		logx.Info(fmt.Sprintf("登录信息存入session成功~!:%v", s))
+		c.JSON(http.StatusOK, r.OK.WithData(s))
+		if err != nil {
+			logx.Error("user信息解码失败")
+			panic(err)
+		}
+		logx.Info("用户登录成功")
 	}
 }
 
-// UserRegister godoc
+// Register godoc
 //
 //	@Summary	User Register
 //	@Produce	json
 //	@Tags		UserApi
-//	@Param		userAccount		body	string	true	"用户名"
-//	@Param		userPassword	body	string	true	"密码"
-//	@Param		checkPassword	body	string	true	"检查密码"
+//	@Param		registerRequest	body	requests.UserRegisterRequest	true	"注册请求参数"
 //	@Accept		json
 //	@Success	0		{object}	models.User	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
 //	@Router		/register [post]
-func UserRegister(c *gin.Context) {
+func Register(c *gin.Context) {
 	userService := &service.UserService{}
 	var req requests.UserRegisterRequest
 	validate := validator.New()
@@ -95,10 +93,14 @@ func UserRegister(c *gin.Context) {
 		log.Println(err.Error())
 		return
 	}
-	res, err := userService.UserRegister(&req)
+	res, err := userService.Register(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, r.SYSTEM_ERROR.WithMsg("注册失败:"+err.Error()))
 	} else {
 		c.JSON(http.StatusOK, r.OK.WithData(res))
 	}
+}
+
+func Current(c *gin.Context) {
+
 }

@@ -10,8 +10,8 @@ import (
 
 type UserService struct{}
 
-// UserLogin 用户登录业务
-func (userService *UserService) UserLogin(request *requests.UserLoginRequest) (user *models.User, err error) {
+// Login 用户登录业务
+func (userService *UserService) Login(request *requests.UserLoginRequest) (user *models.User, err error) {
 	userAccount := request.UserAccount
 	userPassword := request.UserPassword
 	if strutil.IsBlank(userAccount) {
@@ -27,8 +27,8 @@ func (userService *UserService) UserLogin(request *requests.UserLoginRequest) (u
 	return user, err
 }
 
-// UserRegister 用户注册业务
-func (userService *UserService) UserRegister(request *requests.UserRegisterRequest) (res interface{}, err error) {
+// Register 用户注册业务
+func (userService *UserService) Register(request *requests.UserRegisterRequest) (res interface{}, err error) {
 	userAccount := request.UserAccount
 	userPassword := request.UserPassword
 	checkPassword := request.CheckPassword

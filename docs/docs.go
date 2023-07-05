@@ -39,21 +39,12 @@ const docTemplate = `{
                 "summary": "User Login",
                 "parameters": [
                     {
-                        "description": "用户名",
-                        "name": "userAccount",
+                        "description": "登录请求参数",
+                        "name": "loginRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "密码",
-                        "name": "userPassword",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/requests.UserLoginRequest"
                         }
                     }
                 ],
@@ -61,7 +52,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/session.Session"
                         }
                     },
                     "40002": {
@@ -93,30 +84,12 @@ const docTemplate = `{
                 "summary": "User Register",
                 "parameters": [
                     {
-                        "description": "用户名",
-                        "name": "userAccount",
+                        "description": "注册请求参数",
+                        "name": "registerRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "密码",
-                        "name": "userPassword",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "检查密码",
-                        "name": "checkPassword",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/requests.UserRegisterRequest"
                         }
                     }
                 ],
@@ -147,9 +120,6 @@ const docTemplate = `{
         "models.User": {
             "type": "object",
             "properties": {
-                "UserRole": {
-                    "type": "string"
-                },
                 "createTime": {
                     "description": "创建时间",
                     "type": "string"
@@ -173,6 +143,9 @@ const docTemplate = `{
                 },
                 "userPassword": {
                     "type": "string"
+                },
+                "userRole": {
+                    "type": "string"
                 }
             }
         },
@@ -185,6 +158,42 @@ const docTemplate = `{
                 "data": {},
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "requests.UserLoginRequest": {
+            "type": "object",
+            "properties": {
+                "userAccount": {
+                    "type": "string"
+                },
+                "userPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UserRegisterRequest": {
+            "type": "object",
+            "properties": {
+                "checkPassword": {
+                    "type": "string"
+                },
+                "userAccount": {
+                    "type": "string"
+                },
+                "userPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "session.Session": {
+            "type": "object",
+            "properties": {
+                "sessionID": {
+                    "type": "string"
+                },
+                "userInfo": {
+                    "$ref": "#/definitions/models.User"
                 }
             }
         }
