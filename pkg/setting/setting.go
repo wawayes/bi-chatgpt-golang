@@ -12,6 +12,7 @@ var (
 
 	Url      string
 	HTTPPort string
+	Addr     string
 )
 
 func init() {
@@ -27,6 +28,7 @@ func LoadServer() {
 	if err != nil {
 		return
 	}
-	Url = sec.Key("url").String()
-	HTTPPort = sec.Key("http_port").String()
+	Url = sec.Key("URL").String()
+	HTTPPort = sec.Key("HTTP_PORT").String()
+	Addr = sec.Key("ADDR").String()
 }

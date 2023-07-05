@@ -17,6 +17,18 @@ import (
 	"net/http"
 )
 
+// UserLogin godoc
+//
+//	@Summary	User Login
+//	@Produce	json
+//	@Tags		UserApi
+//	@Param		userAccount		body	string	true	"用户名"
+//	@Param		userPassword	body	string	true	"密码"
+//	@Accept		json
+//	@Success	0		{object}	models.User	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Router		/login [post]
 func UserLogin(c *gin.Context) {
 	userService := &service.UserService{}
 	var req requests.UserLoginRequest
@@ -55,6 +67,19 @@ func UserLogin(c *gin.Context) {
 	}
 }
 
+// UserRegister godoc
+//
+//	@Summary	User Register
+//	@Produce	json
+//	@Tags		UserApi
+//	@Param		userAccount		body	string	true	"用户名"
+//	@Param		userPassword	body	string	true	"密码"
+//	@Param		checkPassword	body	string	true	"检查密码"
+//	@Accept		json
+//	@Success	0		{object}	models.User	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Router		/register [post]
 func UserRegister(c *gin.Context) {
 	userService := &service.UserService{}
 	var req requests.UserRegisterRequest
