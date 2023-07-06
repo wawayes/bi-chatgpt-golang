@@ -4,14 +4,15 @@ import (
 	"errors"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
 	"github.com/Walk2future/bi-chatgpt-golang-python/models"
+	"github.com/Walk2future/bi-chatgpt-golang-python/models/serializers"
 	"github.com/duke-git/lancet/v2/strutil"
 	"gorm.io/gorm"
 )
 
 type UserService struct{}
 
-// Login 用户登录业务
-func (userService *UserService) Login(request *requests.UserLoginRequest) (user *models.User, err error) {
+// UserLogin 用户登录业务
+func (userService *UserService) UserLogin(request *requests.LoginRequest) (newUser *serializers.UserSerializer, err error) {
 	userAccount := request.UserAccount
 	userPassword := request.UserPassword
 	if strutil.IsBlank(userAccount) {
@@ -20,15 +21,22 @@ func (userService *UserService) Login(request *requests.UserLoginRequest) (user 
 	if strutil.IsBlank(userPassword) {
 		return nil, errors.New("密码为空")
 	}
+	var user *models.User
 	err = models.BI_DB.Where("userAccount = ? AND userPassword = ?", userAccount, userPassword).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errors.New("用户名或密码错误")
 	}
-	return user, err
+	return &serializers.UserSerializer{
+		ID:          user.ID,
+		UserAccount: user.UserAccount,
+		UserName:    user.UserName,
+		UserAvatar:  user.UserAvatar,
+		UserRole:    user.UserRole,
+	}, err
 }
 
-// Register 用户注册业务
-func (userService *UserService) Register(request *requests.UserRegisterRequest) (res interface{}, err error) {
+// UserRegister 用户注册业务
+func (userService *UserService) UserRegister(request *requests.RegisterRequest) (res interface{}, err error) {
 	userAccount := request.UserAccount
 	userPassword := request.UserPassword
 	checkPassword := request.CheckPassword
