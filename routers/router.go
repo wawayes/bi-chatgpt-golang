@@ -2,7 +2,6 @@ package routers
 
 import (
 	_ "github.com/Walk2future/bi-chatgpt-golang-python/docs"
-	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/jwt"
 	v1 "github.com/Walk2future/bi-chatgpt-golang-python/routers/api/v1"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -20,17 +19,13 @@ func InitRouter() *gin.Engine {
 		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)
 	}
 
-	auth, err := jwt.InitAuth()
-	if err != nil {
-		return nil
-	}
-
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 路由
 	apiv1 := r.Group("/api/v1")
 
-	apiv1.POST("/login", auth.LoginHandler)
+	apiv1.POST("/login", v1.Login)
+	apiv1.GET("/refresh_token", v1.RefreshToken)
 	apiv1.POST("/register", v1.Register)
 	return r
 }

@@ -1,70 +1,45 @@
 package v1
 
 import (
-	"context"
-	"fmt"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/redis"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
+	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/jwt"
 	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/r"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/session"
 	"github.com/Walk2future/bi-chatgpt-golang-python/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	_ "github.com/redis/go-redis/v9"
 	"log"
 	"net/http"
 )
+
+var auth = *jwt.AuthMiddleware
 
 // Login godoc
 //
 //	@Summary	User Login
 //	@Produce	json
 //	@Tags		UserApi
-//	@Param		loginRequest	body	requests.UserLoginRequest	true	"登录请求参数"
+//	@Param		loginRequest	body	requests.LoginRequest	true	"登录请求参数"
 //	@Accept		json
-//	@Success	0		{object}	session.Session	"成功"
+//	@Success	0		{object}	serializers.UserSerializer	"成功"
 //	@Failure	40002	{object}	r.Response		"参数错误"
 //	@Failure	40003	{object}	r.Response		"系统错误"
 //	@Router		/login [post]
 func Login(c *gin.Context) {
-	userService := &service.UserService{}
-	var req requests.UserLoginRequest
-	validate := validator.New()
-	// 使用validator库进行参数校验
-	if err := validate.Struct(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.SYSTEM_ERROR.WithMsg(err.Error()))
-		log.Println(err.Error())
-		return
-	}
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg("请求参数错误"))
-		log.Println(err.Error())
-		return
-	}
-	user, err := userService.Login(&req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, r.SYSTEM_ERROR.WithMsg("登录失败:"+err.Error()))
-	} else {
-		// 将用户信息存入session
-		s := &session.Session{
-			SessionID: uuid.New(),
-			UserInfo:  *user,
-		}
-		err = s.Save(context.Background(), redis.Rdb)
-		if err != nil {
-			logx.Warning("登录信息存入session失败")
-			return
-		}
-		logx.Info(fmt.Sprintf("登录信息存入session成功~!:%v", s))
-		c.JSON(http.StatusOK, r.OK.WithData(s))
-		if err != nil {
-			logx.Error("user信息解码失败")
-			panic(err)
-		}
-		logx.Info("用户登录成功")
-	}
+	auth.LoginHandler(c)
+}
+
+// RefreshToken godoc
+//
+//	@Summary	RefreshToken
+//	@Produce	json
+//	@Tags		UserApi
+//	@Accept		json
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40005	{object}	r.Response		"认证失败"
+//	@Router		/refresh_token [get]
+func RefreshToken(c *gin.Context) {
+	auth.RefreshHandler(c)
 }
 
 // Register godoc
@@ -80,7 +55,7 @@ func Login(c *gin.Context) {
 //	@Router		/register [post]
 func Register(c *gin.Context) {
 	userService := &service.UserService{}
-	var req requests.UserRegisterRequest
+	var req requests.RegisterRequest
 	validate := validator.New()
 	// 使用validator库进行参数校验
 	if err := validate.Struct(&req); err != nil {
