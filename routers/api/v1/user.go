@@ -22,8 +22,8 @@ var auth = *jwt.AuthMiddleware
 //	@Param		loginRequest	body	requests.LoginRequest	true	"登录请求参数"
 //	@Accept		json
 //	@Success	0		{object}	serializers.UserSerializer	"成功"
-//	@Failure	40002	{object}	r.Response		"参数错误"
-//	@Failure	40003	{object}	r.Response		"系统错误"
+//	@Failure	40002	{object}	r.Response					"参数错误"
+//	@Failure	40003	{object}	r.Response					"系统错误"
 //	@Router		/login [post]
 func Login(c *gin.Context) {
 	auth.LoginHandler(c)
@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 //	@Tags		UserApi
 //	@Accept		json
 //	@Success	0		{object}	r.Response	"成功"
-//	@Failure	40005	{object}	r.Response		"认证失败"
+//	@Failure	40005	{object}	r.Response	"认证失败"
 //	@Router		/refresh_token [get]
 func RefreshToken(c *gin.Context) {
 	auth.RefreshHandler(c)
@@ -47,7 +47,7 @@ func RefreshToken(c *gin.Context) {
 //	@Summary	User Register
 //	@Produce	json
 //	@Tags		UserApi
-//	@Param		registerRequest	body	requests.UserRegisterRequest	true	"注册请求参数"
+//	@Param		registerRequest	body	requests.RegisterRequest	true	"注册请求参数"
 //	@Accept		json
 //	@Success	0		{object}	models.User	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"

@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UserLoginRequest"
+                            "$ref": "#/definitions/requests.LoginRequest"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/session.Session"
+                            "$ref": "#/definitions/serializers.UserSerializer"
                         }
                     },
                     "40002": {
@@ -63,6 +63,34 @@ const docTemplate = `{
                     },
                     "40003": {
                         "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_token": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "RefreshToken",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40005": {
+                        "description": "认证失败",
                         "schema": {
                             "$ref": "#/definitions/r.Response"
                         }
@@ -89,7 +117,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UserRegisterRequest"
+                            "$ref": "#/definitions/requests.RegisterRequest"
                         }
                     }
                 ],
@@ -128,7 +156,11 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "updatedTime": {
+                "isDelete": {
+                    "description": "删除时间",
+                    "type": "integer"
+                },
+                "updateTime": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -161,7 +193,7 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.UserLoginRequest": {
+        "requests.LoginRequest": {
             "type": "object",
             "properties": {
                 "userAccount": {
@@ -172,7 +204,7 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.UserRegisterRequest": {
+        "requests.RegisterRequest": {
             "type": "object",
             "properties": {
                 "checkPassword": {
@@ -186,14 +218,24 @@ const docTemplate = `{
                 }
             }
         },
-        "session.Session": {
+        "serializers.UserSerializer": {
             "type": "object",
             "properties": {
-                "sessionID": {
+                "id": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "userAccount": {
                     "type": "string"
                 },
-                "userInfo": {
-                    "$ref": "#/definitions/models.User"
+                "userAvatar": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "string"
+                },
+                "userRole": {
+                    "type": "string"
                 }
             }
         }

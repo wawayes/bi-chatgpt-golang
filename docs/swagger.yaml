@@ -8,7 +8,10 @@ definitions:
       id:
         description: 主键ID
         type: integer
-      updatedTime:
+      isDelete:
+        description: 删除时间
+        type: integer
+      updateTime:
         description: 更新时间
         type: string
       userAccount:
@@ -30,14 +33,14 @@ definitions:
       msg:
         type: string
     type: object
-  requests.UserLoginRequest:
+  requests.LoginRequest:
     properties:
       userAccount:
         type: string
       userPassword:
         type: string
     type: object
-  requests.UserRegisterRequest:
+  requests.RegisterRequest:
     properties:
       checkPassword:
         type: string
@@ -46,12 +49,19 @@ definitions:
       userPassword:
         type: string
     type: object
-  session.Session:
+  serializers.UserSerializer:
     properties:
-      sessionID:
+      id:
+        description: 主键ID
+        type: integer
+      userAccount:
         type: string
-      userInfo:
-        $ref: '#/definitions/models.User'
+      userAvatar:
+        type: string
+      userName:
+        type: string
+      userRole:
+        type: string
     type: object
 externalDocs:
   description: OpenAPI
@@ -80,14 +90,14 @@ paths:
         name: loginRequest
         required: true
         schema:
-          $ref: '#/definitions/requests.UserLoginRequest'
+          $ref: '#/definitions/requests.LoginRequest'
       produces:
       - application/json
       responses:
         "0":
           description: 成功
           schema:
-            $ref: '#/definitions/session.Session'
+            $ref: '#/definitions/serializers.UserSerializer'
         "40002":
           description: 参数错误
           schema:
@@ -97,6 +107,24 @@ paths:
           schema:
             $ref: '#/definitions/r.Response'
       summary: User Login
+      tags:
+      - UserApi
+  /refresh_token:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40005":
+          description: 认证失败
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: RefreshToken
       tags:
       - UserApi
   /register:
@@ -109,7 +137,7 @@ paths:
         name: registerRequest
         required: true
         schema:
-          $ref: '#/definitions/requests.UserRegisterRequest'
+          $ref: '#/definitions/requests.RegisterRequest'
       produces:
       - application/json
       responses:
