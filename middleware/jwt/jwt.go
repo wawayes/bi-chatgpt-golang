@@ -30,6 +30,7 @@ func init() {
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
+		SendCookie:  true,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*models.User); ok {
 				return jwt.MapClaims{
@@ -83,6 +84,19 @@ func init() {
 
 		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
 		TimeFunc: time.Now,
+
+		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
+			c.JSON(http.StatusOK, r.OK.WithData(map[string]interface{}{
+				"token":  token,
+				"expire": expire,
+			}))
+		},
+		RefreshResponse: func(c *gin.Context, code int, token string, expire time.Time) {
+			c.JSON(http.StatusOK, r.OK.WithData(map[string]interface{}{
+				"token":  token,
+				"expire": expire,
+			}))
+		},
 	})
 
 	if err != nil {

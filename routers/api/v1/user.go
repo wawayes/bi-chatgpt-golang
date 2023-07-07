@@ -21,25 +21,12 @@ var auth = *jwt.AuthMiddleware
 //	@Tags		UserApi
 //	@Param		loginRequest	body	requests.LoginRequest	true	"登录请求参数"
 //	@Accept		json
-//	@Success	0		{object}	serializers.UserSerializer	"成功"
-//	@Failure	40002	{object}	r.Response					"参数错误"
-//	@Failure	40003	{object}	r.Response					"系统错误"
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
 //	@Router		/login [post]
 func Login(c *gin.Context) {
 	auth.LoginHandler(c)
-}
-
-// RefreshToken godoc
-//
-//	@Summary	RefreshToken
-//	@Produce	json
-//	@Tags		UserApi
-//	@Accept		json
-//	@Success	0		{object}	r.Response	"成功"
-//	@Failure	40005	{object}	r.Response	"认证失败"
-//	@Router		/refresh_token [get]
-func RefreshToken(c *gin.Context) {
-	auth.RefreshHandler(c)
 }
 
 // Register godoc
@@ -49,7 +36,7 @@ func RefreshToken(c *gin.Context) {
 //	@Tags		UserApi
 //	@Param		registerRequest	body	requests.RegisterRequest	true	"注册请求参数"
 //	@Accept		json
-//	@Success	0		{object}	models.User	"成功"
+//	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
 //	@Router		/register [post]
@@ -74,4 +61,20 @@ func Register(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, r.OK.WithData(res))
 	}
+}
+
+// RefreshToken godoc
+//
+//	@Summary	RefreshToken
+//	@Produce	json
+//	@Tags		UserApi
+//	@Accept		json
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40005	{object}	r.Response	"认证失败"
+//	@Router		/refresh_token [get]
+func RefreshToken(c *gin.Context) {
+	auth.RefreshHandler(c)
+}
+
+func Current(c *gin.Context) {
 }

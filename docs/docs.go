@@ -52,7 +52,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/serializers.UserSerializer"
+                            "$ref": "#/definitions/r.Response"
                         }
                     },
                     "40002": {
@@ -125,7 +125,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/r.Response"
                         }
                     },
                     "40002": {
@@ -145,42 +145,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "主键ID",
-                    "type": "integer"
-                },
-                "isDelete": {
-                    "description": "删除时间",
-                    "type": "integer"
-                },
-                "updateTime": {
-                    "description": "更新时间",
-                    "type": "string"
-                },
-                "userAccount": {
-                    "type": "string"
-                },
-                "userAvatar": {
-                    "type": "string"
-                },
-                "userName": {
-                    "type": "string"
-                },
-                "userPassword": {
-                    "type": "string"
-                },
-                "userRole": {
-                    "type": "string"
-                }
-            }
-        },
         "r.Response": {
             "type": "object",
             "properties": {
@@ -214,27 +178,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userPassword": {
-                    "type": "string"
-                }
-            }
-        },
-        "serializers.UserSerializer": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "description": "主键ID",
-                    "type": "integer"
-                },
-                "userAccount": {
-                    "type": "string"
-                },
-                "userAvatar": {
-                    "type": "string"
-                },
-                "userName": {
-                    "type": "string"
-                },
-                "userRole": {
                     "type": "string"
                 }
             }
