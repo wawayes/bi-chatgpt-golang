@@ -2,6 +2,7 @@ package routers
 
 import (
 	_ "github.com/Walk2future/bi-chatgpt-golang-python/docs"
+	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/cors"
 	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/jwt"
 	v1 "github.com/Walk2future/bi-chatgpt-golang-python/routers/api/v1"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ func InitRouter() *gin.Engine {
 	// 强制日志高亮
 	gin.ForceConsoleColor()
 	r := gin.Default()
-
+	r.Use(cors.Cors())
 	//r.Use(func(c *gin.Context) {
 	//	// 设置cookie的过期时间为一个较早的时间点，比如1970年1月1日
 	//	c.SetCookie("jwt", "", -1, "/", "localhost", false, true)

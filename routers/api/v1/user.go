@@ -86,7 +86,7 @@ func RefreshToken(c *gin.Context) {
 //	@Failure	40005	{object}	r.Response	"获取当前用户信息失败"
 //	@Router		/current [get]
 func Current(c *gin.Context) {
-	value, exists := c.Get("JWT_PAYLOAD")
+	value, exists := c.Get("id")
 	if !exists {
 		c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg("获取当前用户信息失败"))
 		c.Abort()

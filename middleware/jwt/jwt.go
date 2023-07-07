@@ -32,7 +32,11 @@ func init() {
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*serializers.UserSerializer); ok {
 				return jwt.MapClaims{
-					identityKey: v.ID,
+					identityKey:   v.ID,
+					"userAccount": v.UserAccount,
+					"userName":    v.UserName,
+					"userAvatar":  v.UserAvatar,
+					"userRole":    v.UserRole,
 				}
 			}
 			return jwt.MapClaims{}
