@@ -27,19 +27,10 @@ func InitRouter() *gin.Engine {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	auth := jwt.AuthMiddleware
-
 	// 路由
 	apiv1 := r.Group("/api/v1")
-	//apiv1.POST("/login", )
-	apiv1.POST("/login", auth.LoginHandler)
-	apiv1.GET("/refresh_token", auth.RefreshHandler)
 
-<<<<<<< HEAD
-	apiv1.POST("/register", v1.UserRegister)
-=======
 	apiv1.POST("/login", auth.LoginHandler)
 	apiv1.POST("/register", v1.Register)
->>>>>>> origin/dev
 	return r
 }

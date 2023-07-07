@@ -1,6 +1,6 @@
 package requests
 
-type RegisterRequest struct {
+type UserRegisterRequest struct {
 	UserAccount   string `json:"userAccount"`
 	UserPassword  string `json:"userPassword"`
 	CheckPassword string `json:"checkPassword"`
