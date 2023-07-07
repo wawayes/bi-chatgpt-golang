@@ -25,6 +25,34 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/current": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "Current",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40005": {
+                        "description": "获取当前用户信息失败",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "consumes": [

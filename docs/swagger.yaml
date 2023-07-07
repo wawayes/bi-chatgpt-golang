@@ -41,6 +41,24 @@ info:
   title: BI Pro API
   version: "1.0"
 paths:
+  /current:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40005":
+          description: 获取当前用户信息失败
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: Current
+      tags:
+      - UserApi
   /login:
     post:
       consumes:

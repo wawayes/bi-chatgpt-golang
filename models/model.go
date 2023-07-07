@@ -9,7 +9,7 @@ import (
 
 // Model 共有字段
 type Model struct {
-	ID          int64                 `json:"id" gorm:"primary_key"`                           // 主键ID
+	ID          string                `json:"id" gorm:"primary_key"`                           // 主键ID
 	CreateTime  LocalTime             `json:"createTime" gorm:"column:createTime"`             // 创建时间
 	UpdatedTime LocalTime             `json:"updateTime" gorm:"column:updateTime"`             // 更新时间
 	IsDelete    soft_delete.DeletedAt `json:"isDelete" gorm:"column:isDelete;softDelete:flag"` // 删除时间

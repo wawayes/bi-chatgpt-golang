@@ -2,9 +2,7 @@ package jwt
 
 import (
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models"
 	"github.com/Walk2future/bi-chatgpt-golang-python/models/serializers"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
 	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/r"
 	"github.com/Walk2future/bi-chatgpt-golang-python/service"
 	"log"
@@ -30,19 +28,23 @@ func init() {
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
-		SendCookie:  true,
+		SendCookie:  false,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*models.User); ok {
+			if v, ok := data.(*serializers.UserSerializer); ok {
 				return jwt.MapClaims{
-					identityKey: v.UserAccount,
+					identityKey: v.ID,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			return &models.User{
-				UserAccount: claims[identityKey].(string),
+			return &serializers.UserSerializer{
+				ID:          claims[identityKey].(string),
+				UserAccount: claims["userAccount"].(string),
+				UserName:    claims["userName"].(string),
+				UserAvatar:  claims["userAvatar"].(string),
+				UserRole:    claims["userRole"].(string),
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
@@ -53,7 +55,8 @@ func init() {
 			userService := service.UserService{}
 			user, err := userService.Login(&loginVals)
 			if err != nil {
-				logx.Error(err.Error())
+				c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg(err.Error()))
+				panic(err.Error())
 				return nil, err
 			}
 			return user, nil
@@ -66,6 +69,7 @@ func init() {
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg("认证失败"))
+			c.Abort()
 		},
 		// TokenLookup is a string in the form of "<source>:<name>" that is used
 		// to extract token from the request.
