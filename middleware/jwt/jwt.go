@@ -50,7 +50,7 @@ func init() {
 				return "", jwt.ErrMissingLoginValues
 			}
 			userService := service.UserService{}
-			user, err := userService.UserLogin(&loginVals)
+			user, err := userService.Login(&loginVals)
 			if err != nil {
 				logx.Error(err.Error())
 				return nil, err

@@ -33,11 +33,11 @@
                 "parameters": [
                     {
                         "description": "登录请求参数",
-                        "name": "loginRequest",
+                        "name": "registerRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UserLoginRequest"
+                            "$ref": "#/definitions/requests.LoginRequest"
                         }
                     }
                 ],
@@ -45,7 +45,7 @@
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/session.Session"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "40002": {
@@ -56,6 +56,34 @@
                     },
                     "40003": {
                         "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_token": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "RefreshToken",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "40005": {
+                        "description": "无权限",
                         "schema": {
                             "$ref": "#/definitions/r.Response"
                         }
@@ -82,7 +110,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UserRegisterRequest"
+                            "$ref": "#/definitions/requests.RegisterRequest"
                         }
                     }
                 ],
@@ -121,7 +149,11 @@
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "updatedTime": {
+                "isDelete": {
+                    "description": "删除时间",
+                    "type": "integer"
+                },
+                "updateTime": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -154,7 +186,7 @@
                 }
             }
         },
-        "requests.UserLoginRequest": {
+        "requests.LoginRequest": {
             "type": "object",
             "properties": {
                 "userAccount": {
@@ -165,7 +197,7 @@
                 }
             }
         },
-        "requests.UserRegisterRequest": {
+        "requests.RegisterRequest": {
             "type": "object",
             "properties": {
                 "checkPassword": {
@@ -176,17 +208,6 @@
                 },
                 "userPassword": {
                     "type": "string"
-                }
-            }
-        },
-        "session.Session": {
-            "type": "object",
-            "properties": {
-                "sessionID": {
-                    "type": "string"
-                },
-                "userInfo": {
-                    "$ref": "#/definitions/models.User"
                 }
             }
         }
