@@ -6,6 +6,7 @@ import (
 	"github.com/Walk2future/bi-chatgpt-golang-python/models"
 	"github.com/Walk2future/bi-chatgpt-golang-python/models/serializers"
 	"github.com/duke-git/lancet/v2/strutil"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -69,5 +70,14 @@ func (userService *UserService) Register(request *requests.RegisterRequest) (res
 		UserPassword: userPassword,
 	}
 	err = models.BI_DB.Model(&models.User{}).Select("userAccount", "userPassword").Create(&user).Error
-	return user.ID, err
+	return user.UserAccount, err
+}
+
+func (userService *UserService) Current(c *gin.Context) *serializers.UserSerializer {
+	value, exists := c.Get("id")
+	if !exists {
+		return nil
+	}
+	user := value.(*serializers.UserSerializer)
+	return user
 }

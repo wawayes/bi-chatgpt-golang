@@ -41,17 +41,17 @@ func Login(c *gin.Context) {
 //	@Failure	40003	{object}	r.Response	"系统错误"
 //	@Router		/register [post]
 func Register(c *gin.Context) {
-	userService := &service.UserService{}
+	userService := service.UserService{}
 	var req requests.RegisterRequest
 	validate := validator.New()
 	// 使用validator库进行参数校验
-	if err := validate.Struct(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.SYSTEM_ERROR.WithMsg(err.Error()))
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg("请求参数错误"))
 		log.Println(err.Error())
 		return
 	}
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg("请求参数错误"))
+	if err := validate.Struct(&req); err != nil {
+		c.JSON(http.StatusBadRequest, r.SYSTEM_ERROR.WithMsg(err.Error()))
 		log.Println(err.Error())
 		return
 	}
@@ -86,12 +86,13 @@ func RefreshToken(c *gin.Context) {
 //	@Failure	40005	{object}	r.Response	"获取当前用户信息失败"
 //	@Router		/current [get]
 func Current(c *gin.Context) {
-	value, exists := c.Get("id")
-	if !exists {
+	userService := &service.UserService{}
+	user := userService.Current(c)
+	if user == nil {
 		c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg("获取当前用户信息失败"))
 		c.Abort()
 	} else {
-		c.JSON(http.StatusOK, r.OK.WithData(value))
+		c.JSON(http.StatusOK, r.OK.WithData(user))
 	}
 }
 

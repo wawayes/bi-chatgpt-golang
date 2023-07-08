@@ -34,6 +34,8 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 
 	apiv1.POST("/login", v1.Login)
+	apiv1.POST("/register", v1.Register)
+	apiv1.POST("/upload", v1.GenChart)
 	apiv1.GET("/refresh_token", v1.RefreshToken)
 	//apiv1.GET("/current", v1.Current)
 	apiv1.Use(auth.MiddlewareFunc())
@@ -41,6 +43,5 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/current", v1.Current)
 		apiv1.GET("/logout", v1.Logout)
 	}
-	apiv1.POST("/register", v1.Register)
 	return r
 }
