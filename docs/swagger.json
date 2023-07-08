@@ -91,6 +91,40 @@
                 }
             }
         },
+        "/logout": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/refresh_token": {
             "get": {
                 "consumes": [

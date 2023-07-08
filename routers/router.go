@@ -39,6 +39,7 @@ func InitRouter() *gin.Engine {
 	apiv1.Use(auth.MiddlewareFunc())
 	{
 		apiv1.GET("/current", v1.Current)
+		apiv1.GET("/logout", v1.Logout)
 	}
 	apiv1.POST("/register", v1.Register)
 	return r

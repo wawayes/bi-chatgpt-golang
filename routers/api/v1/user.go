@@ -94,3 +94,17 @@ func Current(c *gin.Context) {
 		c.JSON(http.StatusOK, r.OK.WithData(value))
 	}
 }
+
+// Logout godoc
+//
+//	@Summary	Logout
+//	@Produce	json
+//	@Tags		UserApi
+//	@Accept		json
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Router		/logout [get]
+func Logout(c *gin.Context) {
+	auth.LogoutHandler(c)
+}

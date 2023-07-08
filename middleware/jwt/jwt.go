@@ -28,7 +28,7 @@ func init() {
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
-		SendCookie:  false,
+		SendCookie:  true,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*serializers.UserSerializer); ok {
 				return jwt.MapClaims{
@@ -98,6 +98,9 @@ func init() {
 				"token":  token,
 				"expire": expire,
 			}))
+		},
+		LogoutResponse: func(c *gin.Context, code int) {
+			c.JSON(http.StatusOK, r.OK.WithMsg("退出登录成功"))
 		},
 		RefreshResponse: func(c *gin.Context, code int, token string, expire time.Time) {
 			c.JSON(http.StatusOK, r.OK.WithData(map[string]interface{}{
