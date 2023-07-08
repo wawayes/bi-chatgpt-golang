@@ -1,28 +1,36 @@
 package service
 
-//func ValidFile(multipartFile *multipart.FileHeader, fileUploadBizEnum requests.FileUploadBizEnum) {
-//	// 文件大小
-//	fileSize := multipartFile.Size
-//	// 文件后缀
-//	fileSuffix := strings.TrimPrefix(filepath.Ext(multipartFile.Filename), ".")
-//
-//	const OneMax = 1024 * 1024
-//	if fileUploadBizEnum == requests.Files {
-//		if fileSize > OneMax {
-//			panic("文件大小不能超过 1M")
-//		}
-//		allowedFileTypes := []string{"csv", "xlsx"}
-//		if !Contains(allowedFileTypes, fileSuffix) {
-//			panic("文件类型错误")
-//		}
-//	}
-//}
+import (
+	"fmt"
+	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
+	"github.com/xuri/excelize/v2"
+	"mime/multipart"
+)
 
-//func Contains(slice []string, str string) bool {
-//	for _, s := range slice {
-//		if s == str {
-//			return true
-//		}
-//	}
-//	return false
-//}
+var data string
+
+func File2Data(file multipart.File) (string, error) {
+	f, err := excelize.OpenReader(file)
+	if err != nil {
+		logx.Warning(err.Error())
+		return "", err
+	}
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+	// 获取 Sheet1 上所有单元格
+	rows, err := f.GetRows("Sheet1")
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	for _, row := range rows {
+		for _, colCell := range row {
+			data += colCell + "\t"
+		}
+		data += "\n"
+	}
+	return data, nil
+}
