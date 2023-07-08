@@ -2,7 +2,7 @@ package requests
 
 type LoginRequest struct {
 	UserAccount  string `json:"userAccount"`
-	UserPassword string `json:"userPassword" form:"userPassword"`
+	UserPassword string `json:"userPassword"`
 }
 
 type RegisterRequest struct {

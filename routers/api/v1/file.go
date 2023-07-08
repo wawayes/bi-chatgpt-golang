@@ -13,8 +13,20 @@ import (
 	"strings"
 )
 
+// GenChart godoc
+//
+//	@Summary	Generate a chart
+//	@Produce	json
+//	@Tags		ChartApi
+//	@Param		file	formData	file	true	"登录请求参数"
+//	@Param		genRequest	body	requests.GenRequest	true	"生成请求"
+//	@Accept		multipart/form-data
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Router		/gen [post]
 func GenChart(c *gin.Context) {
-	mutipartFile, err := c.FormFile("file")
+	multipartFile, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, r.FAIL.WithMsg("获取文件失败"))
 		return
@@ -33,8 +45,8 @@ func GenChart(c *gin.Context) {
 		return
 	}
 	// 校验文件
-	size := mutipartFile.Size
-	originalFilename := mutipartFile.Filename
+	size := multipartFile.Size
+	originalFilename := multipartFile.Filename
 	// 校验文件大小
 	const ONE_MB = 1024 * 1024
 	if size > ONE_MB {
@@ -48,7 +60,7 @@ func GenChart(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, r.FAIL.WithMsg("文件后缀非法"))
 		return
 	}
-	open, err := mutipartFile.Open()
+	open, err := multipartFile.Open()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, r.SYSTEM_ERROR.WithMsg("文件解析错误"))
 		return

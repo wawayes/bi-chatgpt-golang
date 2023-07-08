@@ -46,6 +46,58 @@
                 }
             }
         },
+        "/gen": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ChartApi"
+                ],
+                "summary": "Generate a chart",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "登录请求参数",
+                        "name": "multipartFile",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "description": "生成请求",
+                        "name": "genRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.GenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "consumes": [
@@ -208,6 +260,17 @@
                 },
                 "data": {},
                 "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.GenRequest": {
+            "type": "object",
+            "properties": {
+                "chartType": {
+                    "type": "string"
+                },
+                "goal": {
                     "type": "string"
                 }
             }

@@ -8,6 +8,13 @@ definitions:
       msg:
         type: string
     type: object
+  requests.GenRequest:
+    properties:
+      chartType:
+        type: string
+      goal:
+        type: string
+    type: object
   requests.LoginRequest:
     properties:
       userAccount:
@@ -59,6 +66,40 @@ paths:
       summary: Current
       tags:
       - UserApi
+  /gen:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 登录请求参数
+        in: formData
+        name: multipartFile
+        required: true
+        type: file
+      - description: 生成请求
+        in: body
+        name: genRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.GenRequest'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40002":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40003":
+          description: 系统错误
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: Generate a chart
+      tags:
+      - ChartApi
   /login:
     post:
       consumes:
