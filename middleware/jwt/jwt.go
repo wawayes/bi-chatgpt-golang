@@ -30,7 +30,7 @@ func init() {
 		IdentityKey: identityKey,
 		SendCookie:  true,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*serializers.UserSerializer); ok {
+			if v, ok := data.(*serializers.CurrentUser); ok {
 				return jwt.MapClaims{
 					identityKey:   v.ID,
 					"userAccount": v.UserAccount,
@@ -43,7 +43,7 @@ func init() {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			return &serializers.UserSerializer{
+			return &serializers.CurrentUser{
 				ID:          claims[identityKey].(string),
 				UserAccount: claims["userAccount"].(string),
 				UserName:    claims["userName"].(string),
@@ -66,7 +66,7 @@ func init() {
 			return user, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*serializers.UserSerializer); ok && v.UserRole != "banned" {
+			if v, ok := data.(*serializers.CurrentUser); ok && v.UserRole != "banned" {
 				return true
 			}
 			return false

@@ -1,6 +1,6 @@
 package serializers
 
-type UserSerializer struct {
+type CurrentUser struct {
 	ID          string `json:"id" gorm:"primary_key"` // 主键ID
 	UserAccount string `json:"userAccount" gorm:"column:userAccount"`
 	UserName    string `json:"userName" gorm:"column:userName"`

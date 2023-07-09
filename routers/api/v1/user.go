@@ -82,8 +82,8 @@ func RefreshToken(c *gin.Context) {
 //	@Produce	json
 //	@Tags		UserApi
 //	@Accept		json
-//	@Success	0		{object}	r.Response	"成功"
-//	@Failure	40005	{object}	r.Response	"获取当前用户信息失败"
+//	@Success	0		{object}	serializers.CurrentUser	"成功"
+//	@Failure	40005	{object}	r.Response					"获取当前用户信息失败"
 //	@Router		/current [get]
 func Current(c *gin.Context) {
 	userService := &service.UserService{}

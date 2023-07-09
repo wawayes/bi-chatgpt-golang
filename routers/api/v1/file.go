@@ -18,10 +18,10 @@ import (
 //	@Summary	Generate a chart
 //	@Produce	json
 //	@Tags		ChartApi
-//	@Param		file	formData	file	true	"登录请求参数"
-//	@Param		genRequest	body	requests.GenRequest	true	"生成请求"
+//	@Param		file		formData	file				true	"登录请求参数"
+//	@Param		genRequest	formData		requests.GenRequest	true	"生成请求"
 //	@Accept		multipart/form-data
-//	@Success	0		{object}	r.Response	"成功"
+//	@Success	0		{object}	response.ChatCompletionResponse	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
 //	@Router		/gen [post]
@@ -70,9 +70,6 @@ func GenChart(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg("文件读取数据错误"))
 		return
 	}
-	c.JSON(http.StatusOK, r.OK.WithData(map[string]interface{}{
-		"data":      data,
-		"goal":      goal,
-		"chartType": chartType,
-	}))
+	resp := service.GetChatResp(data, goal, chartType)
+	c.JSON(http.StatusOK, r.OK.WithData(resp))
 }

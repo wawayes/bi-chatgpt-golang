@@ -41,7 +41,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/r.Response"
+                            "$ref": "#/definitions/serializers.CurrentUser"
                         }
                     },
                     "40005": {
@@ -69,18 +69,19 @@ const docTemplate = `{
                     {
                         "type": "file",
                         "description": "登录请求参数",
-                        "name": "multipartFile",
+                        "name": "file",
                         "in": "formData",
                         "required": true
                     },
                     {
-                        "description": "生成请求",
-                        "name": "genRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.GenRequest"
-                        }
+                        "type": "string",
+                        "name": "chartType",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "goal",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -271,17 +272,6 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.GenRequest": {
-            "type": "object",
-            "properties": {
-                "chartType": {
-                    "type": "string"
-                },
-                "goal": {
-                    "type": "string"
-                }
-            }
-        },
         "requests.LoginRequest": {
             "type": "object",
             "properties": {
@@ -303,6 +293,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "serializers.CurrentUser": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "主键ID",
+                    "type": "string"
+                },
+                "userAccount": {
+                    "type": "string"
+                },
+                "userAvatar": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "string"
+                },
+                "userRole": {
                     "type": "string"
                 }
             }

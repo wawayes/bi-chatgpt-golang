@@ -13,7 +13,7 @@ import (
 type UserService struct{}
 
 // Login 用户登录业务
-func (userService *UserService) Login(request *requests.LoginRequest) (NewUser *serializers.UserSerializer, err error) {
+func (userService *UserService) Login(request *requests.LoginRequest) (NewUser *serializers.CurrentUser, err error) {
 	userAccount := request.UserAccount
 	userPassword := request.UserPassword
 	if strutil.IsBlank(userAccount) {
@@ -27,7 +27,7 @@ func (userService *UserService) Login(request *requests.LoginRequest) (NewUser *
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errors.New("用户名或密码错误")
 	}
-	return &serializers.UserSerializer{
+	return &serializers.CurrentUser{
 		ID:          user.ID,
 		UserAccount: user.UserAccount,
 		UserName:    user.UserName,
@@ -73,11 +73,11 @@ func (userService *UserService) Register(request *requests.RegisterRequest) (res
 	return user.UserAccount, err
 }
 
-func (userService *UserService) Current(c *gin.Context) *serializers.UserSerializer {
+func (userService *UserService) Current(c *gin.Context) *serializers.CurrentUser {
 	value, exists := c.Get("id")
 	if !exists {
 		return nil
 	}
-	user := value.(*serializers.UserSerializer)
+	user := value.(*serializers.CurrentUser)
 	return user
 }

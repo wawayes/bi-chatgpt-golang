@@ -8,13 +8,6 @@ definitions:
       msg:
         type: string
     type: object
-  requests.GenRequest:
-    properties:
-      chartType:
-        type: string
-      goal:
-        type: string
-    type: object
   requests.LoginRequest:
     properties:
       userAccount:
@@ -29,6 +22,20 @@ definitions:
       userAccount:
         type: string
       userPassword:
+        type: string
+    type: object
+  serializers.CurrentUser:
+    properties:
+      id:
+        description: 主键ID
+        type: string
+      userAccount:
+        type: string
+      userAvatar:
+        type: string
+      userName:
+        type: string
+      userRole:
         type: string
     type: object
 externalDocs:
@@ -58,7 +65,7 @@ paths:
         "0":
           description: 成功
           schema:
-            $ref: '#/definitions/r.Response'
+            $ref: '#/definitions/serializers.CurrentUser'
         "40005":
           description: 获取当前用户信息失败
           schema:
@@ -73,15 +80,15 @@ paths:
       parameters:
       - description: 登录请求参数
         in: formData
-        name: multipartFile
+        name: file
         required: true
         type: file
-      - description: 生成请求
-        in: body
-        name: genRequest
-        required: true
-        schema:
-          $ref: '#/definitions/requests.GenRequest'
+      - in: formData
+        name: chartType
+        type: string
+      - in: formData
+        name: goal
+        type: string
       produces:
       - application/json
       responses:
