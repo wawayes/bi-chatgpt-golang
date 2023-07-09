@@ -70,6 +70,10 @@ func GenChart(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg("文件读取数据错误"))
 		return
 	}
-	resp := service.GetChatResp(data, goal, chartType)
-	c.JSON(http.StatusOK, r.OK.WithData(resp))
+	res, err := service.GetChatResp(c, data, goal, chartType)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg("我总感觉大模型越来越傻了,别生气,要不再试一次"))
+	}
+
+	c.JSON(http.StatusOK, r.OK.WithData(res))
 }

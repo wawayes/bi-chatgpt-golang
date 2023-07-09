@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/response"
+	"github.com/Walk2future/bi-chatgpt-golang-python/models"
 	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/xuri/excelize/v2"
 	"io"
@@ -43,8 +45,8 @@ func File2Data(file multipart.File) (data string, err error) {
 	return data, nil
 }
 
-func GetChatResp(info string, goal string, chartType string) response.BiResp {
-	err := godotenv.Load()
+func GetChatResp(c *gin.Context, info string, goal string, chartType string) (res response.BiResp, err error) {
+	err = godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,11 +64,11 @@ func GetChatResp(info string, goal string, chartType string) response.BiResp {
 	}
 	data, err := json.Marshal(chatReq)
 	if err != nil {
-		return response.BiResp{}
+		return response.BiResp{}, err
 	}
 	req, err := http.NewRequest("POST", os.Getenv("BASE_URL"), bytes.NewBuffer(data))
 	if err != nil {
-		return response.BiResp{}
+		return response.BiResp{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
@@ -75,17 +77,17 @@ func GetChatResp(info string, goal string, chartType string) response.BiResp {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request:", err)
-		return response.BiResp{}
+		return response.BiResp{}, err
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return response.BiResp{}
+		return response.BiResp{}, err
 	}
 	var chatResp response.ChatCompletionResponse
 	err = json.Unmarshal(respBody, &chatResp)
 	if err != nil {
-		return response.BiResp{}
+		return response.BiResp{}, err
 	}
 	content := chatResp.Choices[0].Message.Content
 	var biResp response.BiResp
@@ -102,5 +104,20 @@ func GetChatResp(info string, goal string, chartType string) response.BiResp {
 			biResp.GenResult = part
 		}
 	}
-	return biResp
+	//var userService *UserService
+	//current := *userService.Current(c)
+	chart := &models.Chart{
+		//UserId:    current.ID,
+		Data:      info,
+		Goal:      goal,
+		ChartType: chartType,
+		GenChart:  biResp.GenChart,
+		GenResult: biResp.GenResult,
+	}
+	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult").Create(&chart).Error
+	if err != nil {
+		logx.Warning(err.Error())
+		return response.BiResp{}, err
+	}
+	return biResp, nil
 }
