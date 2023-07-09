@@ -19,11 +19,11 @@ import (
 //	@Produce	json
 //	@Tags		ChartApi
 //	@Param		file		formData	file				true	"登录请求参数"
-//	@Param		genRequest	formData		requests.GenRequest	true	"生成请求"
+//	@Param		genRequest	formData	requests.GenRequest	true	"生成请求"
 //	@Accept		multipart/form-data
-//	@Success	0		{object}	response.ChatCompletionResponse	"成功"
-//	@Failure	40002	{object}	r.Response	"参数错误"
-//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Success	0		{object}	response.BiResp	"成功"
+//	@Failure	40002	{object}	r.Response		"参数错误"
+//	@Failure	40003	{object}	r.Response		"系统错误"
 //	@Router		/gen [post]
 func GenChart(c *gin.Context) {
 	multipartFile, err := c.FormFile("file")

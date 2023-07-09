@@ -14,6 +14,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func File2Data(file multipart.File) (data string, err error) {
@@ -42,7 +43,7 @@ func File2Data(file multipart.File) (data string, err error) {
 	return data, nil
 }
 
-func GetChatResp(info string, goal string, chartType string) string {
+func GetChatResp(info string, goal string, chartType string) response.BiResp {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -61,11 +62,11 @@ func GetChatResp(info string, goal string, chartType string) string {
 	}
 	data, err := json.Marshal(chatReq)
 	if err != nil {
-		return err.Error()
+		return response.BiResp{}
 	}
 	req, err := http.NewRequest("POST", os.Getenv("BASE_URL"), bytes.NewBuffer(data))
 	if err != nil {
-		return err.Error()
+		return response.BiResp{}
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
@@ -74,18 +75,32 @@ func GetChatResp(info string, goal string, chartType string) string {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request:", err)
-		return err.Error()
+		return response.BiResp{}
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err.Error()
+		return response.BiResp{}
 	}
 	var chatResp response.ChatCompletionResponse
 	err = json.Unmarshal(respBody, &chatResp)
 	if err != nil {
-		return err.Error()
+		return response.BiResp{}
 	}
-	return chatResp.Choices[0].Message.Content
-
+	content := chatResp.Choices[0].Message.Content
+	var biResp response.BiResp
+	delimiter := "【【【【【\n"
+	parts := strings.Split(content, delimiter)
+	if len(parts) < 3 {
+		logx.Warning("AI生成结果错误，我最近有种大模型不行了的感觉。。")
+	}
+	for i, part := range parts {
+		if i == 1 {
+			biResp.GenChart = part
+		}
+		if i == 2 {
+			biResp.GenResult = part
+		}
+	}
+	return biResp
 }

@@ -88,7 +88,7 @@ const docTemplate = `{
                     "0": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/r.Response"
+                            "$ref": "#/definitions/response.BiResp"
                         }
                     },
                     "40002": {
@@ -293,6 +293,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.BiResp": {
+            "type": "object",
+            "properties": {
+                "genChart": {
+                    "type": "string"
+                },
+                "genResult": {
                     "type": "string"
                 }
             }

@@ -54,7 +54,12 @@ type FunctionCall struct {
 
 // Usage Represents the total token usage per request to OpenAI.
 type Usage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens"`
-	TotalTokens      int `json:"total_tokens"`
+	PromptTokens     int `json:"promptTokens"`
+	CompletionTokens int `json:"completionTokens"`
+	TotalTokens      int `json:"totalTokens"`
+}
+
+type BiResp struct {
+	GenChart  string `json:"genChart"`
+	GenResult string `json:"genResult"`
 }
