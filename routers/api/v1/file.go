@@ -71,7 +71,7 @@ func GenChart(c *gin.Context) {
 		return
 	}
 	res, err := service.GetChatResp(c, data, goal, chartType)
-	if err != nil {
+	if err != nil || strutil.IsBlank(res.GenChart) || strutil.IsBlank(res.GenResult) {
 		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg("我总感觉大模型越来越傻了,别生气,要不再试一次"))
 	}
 

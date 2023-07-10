@@ -95,6 +95,7 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 	parts := strings.Split(content, delimiter)
 	if len(parts) < 3 {
 		logx.Warning("AI生成结果错误，我最近有种大模型不行了的感觉。。")
+		return response.BiResp{}, err
 	}
 	for i, part := range parts {
 		if i == 1 {
@@ -105,16 +106,18 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 		}
 	}
 	//var userService *UserService
-	//current := *userService.Current(c)
+	userService := &UserService{}
+	current := *userService.Current(c)
 	chart := &models.Chart{
-		//UserId:    current.ID,
+		UserId:    current.ID,
 		Data:      info,
 		Goal:      goal,
 		ChartType: chartType,
 		GenChart:  biResp.GenChart,
 		GenResult: biResp.GenResult,
 	}
-	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult").Create(&chart).Error
+	//err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult").Create(&chart).Error
+	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult", "userId").Create(&chart).Error
 	if err != nil {
 		logx.Warning(err.Error())
 		return response.BiResp{}, err
