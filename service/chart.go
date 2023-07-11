@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
 	"github.com/Walk2future/bi-chatgpt-golang-python/common/response"
@@ -19,6 +20,7 @@ import (
 	"strings"
 )
 
+// File2Data 读取xlsx文件数据
 func File2Data(file multipart.File) (data string, err error) {
 	f, err := excelize.OpenReader(file)
 	if err != nil {
@@ -45,6 +47,7 @@ func File2Data(file multipart.File) (data string, err error) {
 	return data, nil
 }
 
+// GetChatResp 获取ChatGPT响应
 func GetChatResp(c *gin.Context, info string, goal string, chartType string) (res response.BiResp, err error) {
 	err = godotenv.Load()
 	if err != nil {
@@ -116,11 +119,31 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 		GenChart:  biResp.GenChart,
 		GenResult: biResp.GenResult,
 	}
-	//err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult").Create(&chart).Error
 	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult", "userId").Create(&chart).Error
 	if err != nil {
 		logx.Warning(err.Error())
 		return response.BiResp{}, err
 	}
 	return biResp, nil
+}
+
+// ListChart 分页查询当前用户图表
+func ListChart(c *gin.Context, chartQueryRequest *requests.ChartQueryRequest) ([]models.Chart, error) {
+	var userService UserService
+	currentUser, err := userService.Current(c)
+	if err != nil {
+		return nil, errors.New("获取当前用户失败")
+	}
+	userId := currentUser.ID
+	chartQueryRequest.UserId = userId
+	pageNum := chartQueryRequest.PageNum
+	pageSize := chartQueryRequest.PageSize
+	if pageSize > 20 {
+		return nil, errors.New("你要的页数太多了")
+	}
+	var chartList []models.Chart
+	if err := models.BI_DB.Model(&chartList).Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&chartList).Error; err != nil {
+		return nil, errors.New("分页查询当前用户图表失败")
+	}
+	return chartList, nil
 }

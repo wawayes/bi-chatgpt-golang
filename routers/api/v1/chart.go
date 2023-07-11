@@ -77,3 +77,33 @@ func GenChart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, r.OK.WithData(res))
 }
+
+// ListChart godoc
+//
+//	@Summary	Chart List
+//	@Produce	json
+//	@Tags		ChartApi
+//	@Param		ChartQueryRequest   application/json	requests.ChartQueryRequest	true	"查询请求参数"
+//	@Accept		multipart/form-data
+//	@Success	0		{object}	response.BiResp	"成功"
+//	@Failure	40002	{object}	r.Response		"参数错误"
+//	@Failure	40003	{object}	r.Response		"系统错误"
+//	@Router		/list [post]
+func ListChart(c *gin.Context) {
+	var req requests.ChartQueryRequest
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg("参数有误"))
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg(err.Error()))
+		return
+	}
+	listChart, err := service.ListChart(c, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, r.FAIL.WithMsg(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, r.OK.WithData(listChart))
+}

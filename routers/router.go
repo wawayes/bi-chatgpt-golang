@@ -32,16 +32,23 @@ func InitRouter() *gin.Engine {
 
 	// 路由
 	apiv1 := r.Group("/api/v1")
+	user := apiv1.Group("/user")
+	chart := apiv1.Group("/chart")
 
-	apiv1.POST("/login", v1.Login)
-	apiv1.POST("/register", v1.Register)
+	user.POST("/login", v1.Login)
+	user.POST("/register", v1.Register)
 	//apiv1.GET("/current", v1.Current)
-	apiv1.Use(auth.MiddlewareFunc())
+	user.Use(auth.MiddlewareFunc())
 	{
-		apiv1.POST("/gen", v1.GenChart)
-		apiv1.GET("/refresh_token", v1.RefreshToken)
-		apiv1.GET("/current", v1.Current)
-		apiv1.GET("/logout", v1.Logout)
+		user.GET("/refresh_token", v1.RefreshToken)
+		user.GET("/current", v1.Current)
+		user.GET("/logout", v1.Logout)
+	}
+
+	chart.Use(auth.MiddlewareFunc())
+	{
+		chart.POST("/gen", v1.GenChart)
+		chart.POST("/list", v1.ListChart)
 	}
 	return r
 }

@@ -14,3 +14,11 @@ type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
+
+type ChartQueryRequest struct {
+	Page
+
+	Goal      string `json:"goal"`
+	ChartType string `json:"chartType"`
+	UserId    string `json:"userId"`
+}

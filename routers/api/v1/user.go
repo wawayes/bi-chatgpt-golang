@@ -109,7 +109,3 @@ func Current(c *gin.Context) {
 func Logout(c *gin.Context) {
 	auth.LogoutHandler(c)
 }
-
-func List(c *gin.Context) {
-
-}
