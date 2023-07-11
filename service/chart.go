@@ -124,6 +124,14 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 		logx.Warning(err.Error())
 		return response.BiResp{}, err
 	}
+	var user models.User
+	if err := models.BI_DB.Model(&user).Where("id = ?", current.ID).First(&user).Error; err != nil {
+		return response.BiResp{}, errors.New("查找当前用户失败")
+	}
+	user.FreeCount--
+	if err := models.BI_DB.Save(&user).Error; err != nil {
+		return response.BiResp{}, errors.New("FreeCount--异常")
+	}
 	return biResp, nil
 }
 
