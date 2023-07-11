@@ -8,6 +8,19 @@ definitions:
       msg:
         type: string
     type: object
+  requests.ChartQueryRequest:
+    properties:
+      chartType:
+        type: string
+      goal:
+        type: string
+      pageNum:
+        type: integer
+      pageSize:
+        type: integer
+      userId:
+        type: string
+    type: object
   requests.LoginRequest:
     properties:
       userAccount:
@@ -62,25 +75,7 @@ info:
   title: BI Pro API
   version: "1.0"
 paths:
-  /current:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "0":
-          description: 成功
-          schema:
-            $ref: '#/definitions/serializers.CurrentUser'
-        "40005":
-          description: 获取当前用户信息失败
-          schema:
-            $ref: '#/definitions/r.Response'
-      summary: Current
-      tags:
-      - UserApi
-  /gen:
+  /chart/gen:
     post:
       consumes:
       - multipart/form-data
@@ -114,7 +109,54 @@ paths:
       summary: Generate a chart
       tags:
       - ChartApi
-  /login:
+  /chart/list:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 查询请求参数
+        in: body
+        name: ChartQueryRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ChartQueryRequest'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.BiResp'
+        "40002":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40003":
+          description: 系统错误
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: Chart List
+      tags:
+      - ChartApi
+  /user/current:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            $ref: '#/definitions/serializers.CurrentUser'
+        "40005":
+          description: 获取当前用户信息失败
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: Current
+      tags:
+      - UserApi
+  /user/login:
     post:
       consumes:
       - application/json
@@ -143,7 +185,7 @@ paths:
       summary: User Login
       tags:
       - UserApi
-  /logout:
+  /user/logout:
     get:
       consumes:
       - application/json
@@ -165,7 +207,7 @@ paths:
       summary: Logout
       tags:
       - UserApi
-  /refresh_token:
+  /user/refresh_token:
     get:
       consumes:
       - application/json
@@ -183,7 +225,7 @@ paths:
       summary: RefreshToken
       tags:
       - UserApi
-  /register:
+  /user/register:
     post:
       consumes:
       - application/json

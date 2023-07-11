@@ -25,35 +25,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/current": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "UserApi"
-                ],
-                "summary": "Current",
-                "responses": {
-                    "0": {
-                        "description": "成功",
-                        "schema": {
-                            "$ref": "#/definitions/serializers.CurrentUser"
-                        }
-                    },
-                    "40005": {
-                        "description": "获取当前用户信息失败",
-                        "schema": {
-                            "$ref": "#/definitions/r.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/gen": {
+        "/chart/gen": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -106,7 +78,80 @@ const docTemplate = `{
                 }
             }
         },
-        "/login": {
+        "/chart/list": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ChartApi"
+                ],
+                "summary": "Chart List",
+                "parameters": [
+                    {
+                        "description": "查询请求参数",
+                        "name": "ChartQueryRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ChartQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/response.BiResp"
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/current": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "Current",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/serializers.CurrentUser"
+                        }
+                    },
+                    "40005": {
+                        "description": "获取当前用户信息失败",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -151,7 +196,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/logout": {
+        "/user/logout": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -185,7 +230,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/refresh_token": {
+        "/user/refresh_token": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -213,7 +258,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/user/register": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -268,6 +313,26 @@ const docTemplate = `{
                 },
                 "data": {},
                 "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.ChartQueryRequest": {
+            "type": "object",
+            "properties": {
+                "chartType": {
+                    "type": "string"
+                },
+                "goal": {
+                    "type": "string"
+                },
+                "pageNum": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "userId": {
                     "type": "string"
                 }
             }

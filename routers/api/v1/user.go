@@ -24,7 +24,7 @@ var auth = *jwt.AuthMiddleware
 //	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
-//	@Router		/login [post]
+//	@Router		/user/login [post]
 func Login(c *gin.Context) {
 	auth.LoginHandler(c)
 }
@@ -39,25 +39,25 @@ func Login(c *gin.Context) {
 //	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
-//	@Router		/register [post]
+//	@Router		/user/register [post]
 func Register(c *gin.Context) {
 	userService := service.UserService{}
 	var req requests.RegisterRequest
 	validate := validator.New()
 	// 使用validator库进行参数校验
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg("请求参数错误"))
+		c.JSON(http.StatusOK, r.PARAMS_ERROR.WithMsg("请求参数错误"))
 		log.Println(err.Error())
 		return
 	}
 	if err := validate.Struct(&req); err != nil {
-		c.JSON(http.StatusBadRequest, r.SYSTEM_ERROR.WithMsg(err.Error()))
+		c.JSON(http.StatusOK, r.SYSTEM_ERROR.WithMsg(err.Error()))
 		log.Println(err.Error())
 		return
 	}
 	res, err := userService.Register(&req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, r.SYSTEM_ERROR.WithMsg("注册失败:"+err.Error()))
+		c.JSON(http.StatusOK, r.SYSTEM_ERROR.WithMsg("注册失败:"+err.Error()))
 	} else {
 		c.JSON(http.StatusOK, r.OK.WithData(res))
 	}
@@ -71,7 +71,7 @@ func Register(c *gin.Context) {
 //	@Accept		json
 //	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40005	{object}	r.Response	"认证失败"
-//	@Router		/refresh_token [get]
+//	@Router		/user/refresh_token [get]
 func RefreshToken(c *gin.Context) {
 	auth.RefreshHandler(c)
 }
@@ -84,12 +84,12 @@ func RefreshToken(c *gin.Context) {
 //	@Accept		json
 //	@Success	0		{object}	serializers.CurrentUser	"成功"
 //	@Failure	40005	{object}	r.Response				"获取当前用户信息失败"
-//	@Router		/current [get]
+//	@Router		/user/current [get]
 func Current(c *gin.Context) {
 	userService := &service.UserService{}
 	user, err := userService.Current(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg(err.Error()))
+		c.JSON(http.StatusOK, r.NO_AUTH.WithMsg(err.Error()))
 		c.Abort()
 	} else {
 		c.JSON(http.StatusOK, r.OK.WithData(user))
@@ -105,7 +105,7 @@ func Current(c *gin.Context) {
 //	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
-//	@Router		/logout [get]
+//	@Router		/user/logout [get]
 func Logout(c *gin.Context) {
 	auth.LogoutHandler(c)
 }

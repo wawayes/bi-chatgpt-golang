@@ -59,7 +59,7 @@ func init() {
 			userService := service.UserService{}
 			user, err := userService.Login(&loginVals)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, r.PARAMS_ERROR.WithMsg(err.Error()))
+				c.JSON(http.StatusOK, r.PARAMS_ERROR.WithMsg(err.Error()))
 				panic(err.Error())
 				return nil, err
 			}
@@ -85,7 +85,7 @@ func init() {
 			return false
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg("认证失败"))
+			c.JSON(http.StatusOK, r.NO_AUTH.WithMsg("认证失败"))
 			c.Abort()
 		},
 		// TokenLookup is a string in the form of "<source>:<name>" that is used

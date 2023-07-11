@@ -20,8 +20,8 @@ import (
 	"strings"
 )
 
-// File2Data 读取xlsx文件数据
-func File2Data(file multipart.File) (data string, err error) {
+// Xlsx2Data 读取xlsx文件数据
+func Xlsx2Data(file multipart.File) (data string, err error) {
 	f, err := excelize.OpenReader(file)
 	if err != nil {
 		logx.Warning(err.Error())
