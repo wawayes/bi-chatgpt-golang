@@ -63,6 +63,19 @@ func init() {
 				panic(err.Error())
 				return nil, err
 			}
+			// 生成token
+			//token, expire, err := AuthMiddleware.TokenGenerator(user)
+			//if err != nil {
+			//	return nil, err
+			//}
+			// 将token存入redis
+			// 将time.Time转化为Duration
+			//duration := time.Until(expire)
+			//redisDuration := duration.Round(time.Second)
+			//statusCmd := redis.Rdb.Set(context.Background(), "token:"+user.ID, token, redisDuration)
+			//if statusCmd.Err() != nil {
+			//	return nil, statusCmd.Err()
+			//}
 			return user, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {

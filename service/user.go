@@ -61,7 +61,7 @@ func (userService *UserService) Register(request *requests.RegisterRequest) (res
 	}
 	// TODO 检查非法字符
 	var count int64
-	models.BI_DB.Model(&models.User{}).Where("userAccount = ?", userAccount).Count(&count)
+	models.BI_DB.Model(&models.User{}).Where("userAccount = ?", userAccount).First(&count)
 	if count != 0 {
 		return nil, errors.New("用户名已存在")
 	}
@@ -73,11 +73,70 @@ func (userService *UserService) Register(request *requests.RegisterRequest) (res
 	return user.UserAccount, err
 }
 
-func (userService *UserService) Current(c *gin.Context) *serializers.CurrentUser {
+// Current 获取当前用户业务
+func (userService *UserService) Current(c *gin.Context) (*serializers.CurrentUser, error) {
 	value, exists := c.Get("id")
 	if !exists {
-		return nil
+		return nil, errors.New("ID not found")
 	}
-	user := value.(*serializers.CurrentUser)
-	return user
+
+	return value.(*serializers.CurrentUser), nil
+}
+
+// Add 新增用户操作
+func (userService *UserService) Add(requests.AddRequest) (id string, err error) {
+	var user *models.User
+	err = models.BI_DB.Model(&models.User{}).Select("userAccount", "userPassword", "userName",
+		"userAvatar", "userRole", "freeCount").Create(&user).Error
+	if err != nil {
+		return "", errors.New("插入数据库失败")
+	}
+	return user.ID, nil
+}
+
+// RemoveById 根据主键删除用户
+func (userService *UserService) RemoveById(id string) (bool, error) {
+	var user *models.User
+	tx := models.BI_DB.Model(&user).Delete(&user, id)
+	if tx.Error != nil {
+		return false, errors.New("根据id删除用户失败")
+	}
+	return true, nil
+}
+
+// BatchRemove 根据id切片批量删除用户
+func (userService *UserService) BatchRemove(ids []string) (bool, error) {
+	var user models.User
+	if err := models.BI_DB.Model(&user).Where("id IN (?)", ids).Delete(&user).Error; err != nil {
+		return false, errors.New("批量删除用户失败")
+	}
+	return true, nil
+}
+
+// Update 修改用户信息
+func (userService *UserService) Update(newUser *models.User) (bool, error) {
+	var user *models.User
+	if tx := models.BI_DB.Model(&user).Updates(newUser); tx.Error != nil {
+		return false, errors.New("更新用户信息失败")
+	}
+	return true, nil
+}
+
+// List 查询用户信息
+func List(page requests.Page) ([]serializers.CurrentUser, error) {
+	var userList []models.User
+	if tx := models.BI_DB.Model(&models.User{}).Offset((page.PageNum - 1) * page.PageSize).Limit(page.PageSize).Find(&userList); tx.Error != nil {
+		return nil, errors.New("查询用户信息失败")
+	}
+	var list []serializers.CurrentUser
+	for i, user := range userList {
+		list[i] = serializers.CurrentUser{
+			ID:          user.ID,
+			UserAccount: user.UserAccount,
+			UserName:    user.UserName,
+			UserAvatar:  user.UserAvatar,
+			UserRole:    user.UserRole,
+		}
+	}
+	return list, nil
 }

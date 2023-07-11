@@ -87,9 +87,9 @@ func RefreshToken(c *gin.Context) {
 //	@Router		/current [get]
 func Current(c *gin.Context) {
 	userService := &service.UserService{}
-	user := userService.Current(c)
-	if user == nil {
-		c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg("获取当前用户信息失败"))
+	user, err := userService.Current(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, r.NO_AUTH.WithMsg(err.Error()))
 		c.Abort()
 	} else {
 		c.JSON(http.StatusOK, r.OK.WithData(user))
@@ -108,4 +108,8 @@ func Current(c *gin.Context) {
 //	@Router		/logout [get]
 func Logout(c *gin.Context) {
 	auth.LogoutHandler(c)
+}
+
+func List(c *gin.Context) {
+
 }

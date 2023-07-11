@@ -30,5 +30,4 @@ func init() {
 		Password: redisPassword, // no password set
 		DB:       redisDB,       // use default DB
 	})
-
 }

@@ -9,6 +9,7 @@ type User struct {
 	UserName     string `json:"userName" gorm:"column:userName"`
 	UserAvatar   string `json:"userAvatar" gorm:"column:userAvatar"`
 	UserRole     string `json:"userRole" gorm:"column:userRole"`
+	FreeCount    string `json:"freeCount" gorm:"column:freeCount"`
 }
 
 func (User) TableName() string {

@@ -107,7 +107,7 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 	}
 	//var userService *UserService
 	userService := &UserService{}
-	current := *userService.Current(c)
+	current, _ := userService.Current(c)
 	chart := &models.Chart{
 		UserId:    current.ID,
 		Data:      info,
