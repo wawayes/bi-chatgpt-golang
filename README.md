@@ -66,21 +66,21 @@ BI-Golang-ChatGPT
 
 界面展示：
 
-![image-20230712205336132.png](/Users/wangmingyao/Downloads/afVHWOI8FpQqs4E.png)
+![image-20230712205336132.png](https://s2.loli.net/2023/07/12/afVHWOI8FpQqs4E.png)
 
 
 
 
 
-![image-20230712205555067.png](/Users/wangmingyao/Downloads/9CvTGewIarod36F.png)
+![image-20230712205555067.png](https://s2.loli.net/2023/07/12/9CvTGewIarod36F.png)
 
 
 
-![image-20230712205854897.png](/Users/wangmingyao/Downloads/o5GxuNIs7HzWTkA.png)
+![image-20230712205854897.png](https://s2.loli.net/2023/07/12/o5GxuNIs7HzWTkA.png)
 
 
 
-![image-20230712205914683.png](/Users/wangmingyao/Downloads/KO2WiXUDQvzfHk5.png)
+![image-20230712205914683.png](https://s2.loli.net/2023/07/12/KO2WiXUDQvzfHk5.png)
 
 
 
