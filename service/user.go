@@ -61,7 +61,7 @@ func (userService *UserService) Register(request *requests.RegisterRequest) (res
 	}
 	// TODO 检查非法字符
 	var count int64
-	models.BI_DB.Model(&models.User{}).Where("userAccount = ?", userAccount).First(&count)
+	models.BI_DB.Model(&models.User{}).Where("userAccount = ?", userAccount).Count(&count)
 	if count != 0 {
 		return nil, errors.New("用户名已存在")
 	}
@@ -84,12 +84,12 @@ func (userService *UserService) Current(c *gin.Context) (*serializers.CurrentUse
 }
 
 // Add 新增用户操作
-func (userService *UserService) Add(requests.AddRequest) (id string, err error) {
+func (userService *UserService) Add(requests.AddUserRequest) (id int, err error) {
 	var user *models.User
 	err = models.BI_DB.Model(&models.User{}).Select("userAccount", "userPassword", "userName",
 		"userAvatar", "userRole", "freeCount").Create(&user).Error
 	if err != nil {
-		return "", errors.New("插入数据库失败")
+		return -1, errors.New("插入数据库失败")
 	}
 	return user.ID, nil
 }
@@ -123,20 +123,21 @@ func (userService *UserService) Update(newUser *models.User) (bool, error) {
 }
 
 // List 查询用户信息
-func List(page requests.Page) ([]serializers.CurrentUser, error) {
+func List(page *requests.Page) ([]serializers.CurrentUser, error) {
 	var userList []models.User
 	if tx := models.BI_DB.Model(&models.User{}).Offset((page.PageNum - 1) * page.PageSize).Limit(page.PageSize).Find(&userList); tx.Error != nil {
 		return nil, errors.New("查询用户信息失败")
 	}
 	var list []serializers.CurrentUser
-	for i, user := range userList {
-		list[i] = serializers.CurrentUser{
+	for _, user := range userList {
+		currentUser := serializers.CurrentUser{
 			ID:          user.ID,
 			UserAccount: user.UserAccount,
 			UserName:    user.UserName,
 			UserAvatar:  user.UserAvatar,
 			UserRole:    user.UserRole,
 		}
+		list = append(list, currentUser)
 	}
 	return list, nil
 }

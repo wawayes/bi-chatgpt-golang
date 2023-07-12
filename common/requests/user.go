@@ -11,7 +11,7 @@ type RegisterRequest struct {
 	CheckPassword string `json:"checkPassword"`
 }
 
-type AddRequest struct {
+type AddUserRequest struct {
 	UserAccount  string `json:"userAccount"`
 	UserPassword string `json:"userPassword"`
 	UserName     string `json:"userName"`

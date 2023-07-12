@@ -11,6 +11,7 @@ import (
 	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/pandodao/tokenizer-go"
 	"github.com/xuri/excelize/v2"
 	"io"
 	"log"
@@ -75,7 +76,6 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -109,6 +109,10 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 		}
 	}
 	//var userService *UserService
+	// 计算token值
+	OriginStr := systemPrompt + prompt + content
+	t := tokenizer.MustCalToken(OriginStr)
+
 	userService := &UserService{}
 	current, _ := userService.Current(c)
 	chart := &models.Chart{
@@ -118,8 +122,10 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 		ChartType: chartType,
 		GenChart:  biResp.GenChart,
 		GenResult: biResp.GenResult,
+		// TODO token计算然后存储
+		Token: t,
 	}
-	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult", "userId").Create(&chart).Error
+	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult", "userId", "token").Create(&chart).Error
 	if err != nil {
 		logx.Warning(err.Error())
 		return response.BiResp{}, err
@@ -155,3 +161,18 @@ func ListChart(c *gin.Context, chartQueryRequest *requests.ChartQueryRequest) ([
 	}
 	return chartList, nil
 }
+
+// ListAllChart 分页查询所有用户图表
+func ListAllChart(chartQueryRequest *requests.ChartQueryRequest) (listAllChart []models.Chart, err error) {
+	pageNum := chartQueryRequest.PageNum
+	pageSize := chartQueryRequest.PageSize
+	if err = models.BI_DB.Model(&listAllChart).Select("").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&listAllChart).Error; err != nil {
+		return nil, errors.New("数据库查询listAllChart失败")
+	}
+	return listAllChart, nil
+}
+
+// AddChart 添加一条chart记录
+//func AddChart(addRequest *requests.AddRequest) (bool, error) {
+//
+//}

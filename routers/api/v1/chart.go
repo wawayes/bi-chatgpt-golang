@@ -74,8 +74,8 @@ func GenChart(c *gin.Context) {
 	res, err := service.GetChatResp(c, data, goal, chartType)
 	if err != nil || strutil.IsBlank(res.GenChart) || strutil.IsBlank(res.GenResult) {
 		c.JSON(http.StatusOK, r.FAIL.WithMsg("我总感觉大模型越来越傻了,别生气,要不再试一次"))
+		return
 	}
-
 	c.JSON(http.StatusOK, r.OK.WithData(res))
 }
 
@@ -97,14 +97,25 @@ func ListChart(c *gin.Context) {
 		c.JSON(http.StatusOK, r.PARAMS_ERROR.WithMsg("参数有误"))
 		return
 	}
-	if err != nil {
-		c.JSON(http.StatusOK, r.FAIL.WithMsg(err.Error()))
-		return
-	}
 	listChart, err := service.ListChart(c, &req)
 	if err != nil {
 		c.JSON(http.StatusOK, r.FAIL.WithMsg(err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, r.OK.WithData(listChart))
+}
+
+func ListAllChart(c *gin.Context) {
+	var req requests.ChartQueryRequest
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, r.PARAMS_ERROR.WithMsg("参数错误"))
+		return
+	}
+	allChart, err := service.ListAllChart(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, r.FAIL.WithMsg(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, r.OK.WithData(allChart))
 }

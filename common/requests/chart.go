@@ -18,6 +18,16 @@ type Message struct {
 type ChartQueryRequest struct {
 	Page
 
+	Key       string `json:"key"`
+	Goal      string `json:"goal"`
+	ChartType string `json:"chartType"`
+	UserId    int    `json:"userId"`
+}
+
+type AddRequest struct {
+	Page
+
+	Key       string `json:"key"`
 	Goal      string `json:"goal"`
 	ChartType string `json:"chartType"`
 	UserId    string `json:"userId"`

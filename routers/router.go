@@ -41,6 +41,7 @@ func InitRouter() *gin.Engine {
 	user.Use(auth.MiddlewareFunc())
 	{
 		user.GET("/refresh_token", v1.RefreshToken)
+		user.GET("/list", v1.List)
 		user.GET("/current", v1.Current)
 		user.GET("/logout", v1.Logout)
 	}
@@ -49,6 +50,7 @@ func InitRouter() *gin.Engine {
 	{
 		chart.POST("/gen", v1.GenChart)
 		chart.POST("/list", v1.ListChart)
+		chart.POST("/listALl", v1.ListAllChart)
 	}
 	return r
 }

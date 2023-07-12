@@ -25,14 +25,6 @@ type ChatCompletionChoice struct {
 
 type FinishReason string
 
-const (
-	FinishReasonStop          FinishReason = "stop"
-	FinishReasonLength        FinishReason = "length"
-	FinishReasonFunctionCall  FinishReason = "function_call"
-	FinishReasonContentFilter FinishReason = "content_filter"
-	FinishReasonNull          FinishReason = "null"
-)
-
 type ChatCompletionMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`

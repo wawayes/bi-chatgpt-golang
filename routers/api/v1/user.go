@@ -109,3 +109,28 @@ func Current(c *gin.Context) {
 func Logout(c *gin.Context) {
 	auth.LogoutHandler(c)
 }
+
+// List godoc
+//
+//	@Summary	List
+//	@Produce	json
+//	@Tags		UserApi
+//	@Accept		json
+//	@Success	0		{object}	r.Response	"成功"
+//	@Failure	40002	{object}	r.Response	"参数错误"
+//	@Failure	40003	{object}	r.Response	"系统错误"
+//	@Router		/user/logout [get]
+func List(c *gin.Context) {
+	var req requests.Page
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, r.FAIL.WithMsg(err.Error()))
+		return
+	}
+	list, err := service.List(&req)
+	if err != nil {
+		c.JSON(http.StatusOK, r.FAIL.WithMsg(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, r.OK.WithData(list))
+}

@@ -44,7 +44,7 @@ func init() {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &serializers.CurrentUser{
-				ID:          claims[identityKey].(string),
+				ID:          int(claims[identityKey].(float64)),
 				UserAccount: claims["userAccount"].(string),
 				UserName:    claims["userName"].(string),
 				UserAvatar:  claims["userAvatar"].(string),
