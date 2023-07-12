@@ -1,5 +1,20 @@
 basePath: /api/v1
 definitions:
+  models.UserChart:
+    properties:
+      freeCount:
+        type: integer
+      id:
+        type: integer
+      token:
+        type: integer
+      userAccount:
+        type: string
+      userAvatar:
+        type: string
+      userId:
+        type: integer
+    type: object
   r.Response:
     properties:
       code:
@@ -14,12 +29,14 @@ definitions:
         type: string
       goal:
         type: string
+      key:
+        type: string
       pageNum:
         type: integer
       pageSize:
         type: integer
       userId:
-        type: string
+        type: integer
     type: object
   requests.LoginRequest:
     properties:
@@ -27,6 +44,13 @@ definitions:
         type: string
       userPassword:
         type: string
+    type: object
+  requests.Page:
+    properties:
+      pageNum:
+        type: integer
+      pageSize:
+        type: integer
     type: object
   requests.RegisterRequest:
     properties:
@@ -48,7 +72,7 @@ definitions:
     properties:
       id:
         description: 主键ID
-        type: string
+        type: integer
       userAccount:
         type: string
       userAvatar:
@@ -138,6 +162,37 @@ paths:
       summary: Chart List
       tags:
       - ChartApi
+  /table/list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 登录请求参数
+        in: body
+        name: pageRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Page'
+      produces:
+      - application/json
+      responses:
+        "0":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/models.UserChart'
+            type: array
+        "40002":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/r.Response'
+        "40003":
+          description: 系统错误
+          schema:
+            $ref: '#/definitions/r.Response'
+      summary: ListUserTable
+      tags:
+      - TableApi
   /user/current:
     get:
       consumes:
@@ -204,7 +259,7 @@ paths:
           description: 系统错误
           schema:
             $ref: '#/definitions/r.Response'
-      summary: Logout
+      summary: List
       tags:
       - UserApi
   /user/refresh_token:

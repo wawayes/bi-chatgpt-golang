@@ -34,6 +34,7 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 	user := apiv1.Group("/user")
 	chart := apiv1.Group("/chart")
+	table := apiv1.Group("/table")
 
 	user.POST("/login", v1.Login)
 	user.POST("/register", v1.Register)
@@ -51,6 +52,11 @@ func InitRouter() *gin.Engine {
 		chart.POST("/gen", v1.GenChart)
 		chart.POST("/list", v1.ListChart)
 		chart.POST("/listALl", v1.ListAllChart)
+	}
+
+	table.Use(auth.MiddlewareFunc())
+	{
+		table.POST("/list", v1.ListUserTable)
 	}
 	return r
 }

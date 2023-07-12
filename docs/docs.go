@@ -123,6 +123,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/table/list": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TableApi"
+                ],
+                "summary": "ListUserTable",
+                "parameters": [
+                    {
+                        "description": "登录请求参数",
+                        "name": "pageRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Page"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserChart"
+                            }
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/current": {
             "get": {
                 "consumes": [
@@ -207,7 +255,7 @@ const docTemplate = `{
                 "tags": [
                     "UserApi"
                 ],
-                "summary": "Logout",
+                "summary": "List",
                 "responses": {
                     "0": {
                         "description": "成功",
@@ -305,6 +353,29 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.UserChart": {
+            "type": "object",
+            "properties": {
+                "freeCount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "integer"
+                },
+                "userAccount": {
+                    "type": "string"
+                },
+                "userAvatar": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
         "r.Response": {
             "type": "object",
             "properties": {
@@ -326,6 +397,9 @@ const docTemplate = `{
                 "goal": {
                     "type": "string"
                 },
+                "key": {
+                    "type": "string"
+                },
                 "pageNum": {
                     "type": "integer"
                 },
@@ -333,7 +407,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "userId": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -345,6 +419,17 @@ const docTemplate = `{
                 },
                 "userPassword": {
                     "type": "string"
+                }
+            }
+        },
+        "requests.Page": {
+            "type": "object",
+            "properties": {
+                "pageNum": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -378,7 +463,7 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "主键ID",
-                    "type": "string"
+                    "type": "integer"
                 },
                 "userAccount": {
                     "type": "string"
