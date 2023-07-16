@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/bi-chatgpt-golang-python.iml" filepath="$PROJECT_DIR$/.idea/bi-chatgpt-golang-python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/bi-chatgpt-golang.iml" filepath="$PROJECT_DIR$/.idea/bi-chatgpt-golang.iml" />
     </modules>
   </component>
 </project>
