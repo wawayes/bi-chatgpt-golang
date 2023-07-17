@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
+	"github.com/wawayes/bi-chatgpt-golang/models"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
 	"time"
 )
 

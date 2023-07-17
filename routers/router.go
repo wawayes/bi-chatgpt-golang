@@ -1,13 +1,13 @@
 package routers
 
 import (
-	_ "github.com/Walk2future/bi-chatgpt-golang-python/docs"
-	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/cors"
-	"github.com/Walk2future/bi-chatgpt-golang-python/middleware/jwt"
-	v1 "github.com/Walk2future/bi-chatgpt-golang-python/routers/api/v1"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/wawayes/bi-chatgpt-golang/docs"
+	"github.com/wawayes/bi-chatgpt-golang/middleware/cors"
+	"github.com/wawayes/bi-chatgpt-golang/middleware/jwt"
+	v1 "github.com/wawayes/bi-chatgpt-golang/routers/api/v1"
 	"log"
 )
 

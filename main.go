@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/setting"
-	"github.com/Walk2future/bi-chatgpt-golang-python/routers"
 	"github.com/robfig/cron"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/setting"
+	"github.com/wawayes/bi-chatgpt-golang/routers"
 	"log"
 	"net/http"
 	"time"

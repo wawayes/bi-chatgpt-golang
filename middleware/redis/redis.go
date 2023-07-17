@@ -2,9 +2,9 @@ package redis
 
 import (
 	"fmt"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/logx"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/setting"
 	"github.com/redis/go-redis/v9"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/setting"
 )
 
 var Rdb *redis.Client

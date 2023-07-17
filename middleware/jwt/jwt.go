@@ -1,10 +1,10 @@
 package jwt
 
 import (
-	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models/serializers"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/r"
-	"github.com/Walk2future/bi-chatgpt-golang-python/service"
+	"github.com/wawayes/bi-chatgpt-golang/common/requests"
+	"github.com/wawayes/bi-chatgpt-golang/models/serializers"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/r"
+	"github.com/wawayes/bi-chatgpt-golang/service"
 	"log"
 	"net/http"
 	"time"

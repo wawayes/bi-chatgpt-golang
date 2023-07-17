@@ -2,11 +2,11 @@ package service
 
 import (
 	"errors"
-	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models/serializers"
 	"github.com/duke-git/lancet/v2/strutil"
 	"github.com/gin-gonic/gin"
+	"github.com/wawayes/bi-chatgpt-golang/common/requests"
+	"github.com/wawayes/bi-chatgpt-golang/models"
+	"github.com/wawayes/bi-chatgpt-golang/models/serializers"
 	"gorm.io/gorm"
 )
 

@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/pkg/r"
-	"github.com/Walk2future/bi-chatgpt-golang-python/service"
 	"github.com/duke-git/lancet/v2/strutil"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/wawayes/bi-chatgpt-golang/common/requests"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/r"
+	"github.com/wawayes/bi-chatgpt-golang/service"
 	"log"
 	"net/http"
 	"path/filepath"

@@ -1,9 +1,8 @@
-module bi-chatgpt-golang
+module github.com/wawayes/bi-chatgpt-golang
 
 go 1.20
 
 require (
-	github.com/Walk2future/bi-chatgpt-golang-python v0.0.0-20230712150054-06e4127e736e
 	github.com/appleboy/gin-jwt/v2 v2.9.1
 	github.com/duke-git/lancet/v2 v2.2.2
 	github.com/gin-gonic/gin v1.9.1
@@ -12,6 +11,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pandodao/tokenizer-go v0.2.0
 	github.com/redis/go-redis/v9 v9.0.5
+	github.com/robfig/cron v1.2.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
@@ -58,7 +58,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
-	github.com/robfig/cron v1.2.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

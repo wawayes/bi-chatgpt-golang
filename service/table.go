@@ -2,8 +2,8 @@ package service
 
 import (
 	"errors"
-	"github.com/Walk2future/bi-chatgpt-golang-python/common/requests"
-	"github.com/Walk2future/bi-chatgpt-golang-python/models"
+	"github.com/wawayes/bi-chatgpt-golang/common/requests"
+	"github.com/wawayes/bi-chatgpt-golang/models"
 )
 
 type TableService struct{}
