@@ -8,6 +8,7 @@ type Chart struct {
 	Name      string `json:"name" gorm:"column:name"`
 	Data      string `json:"data" gorm:"column:chartData"`
 	ChartType string `json:"chartType" gorm:"column:chartType"`
+	Status    string `json:"status" gorm:"column:status"`
 	Token     int    `json:"token" gorm:"column:token"`
 	GenChart  string `json:"genChart" gorm:"column:genChart"`
 	GenResult string `json:"genResult" gorm:"column:genResult"`
@@ -32,17 +33,17 @@ func (chart *Chart) TableName() string {
 //	return nil
 //}
 
-func (chart *Chart) AfterCreate(tx *gorm.DB) (err error) {
+func (chart *Chart) AfterUpdate(tx *gorm.DB) (err error) {
 	var userChart UserChart
 	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).First(&userChart)
 
 	var user User
-	tx.Preload("UserChart").Where("userId = ?", chart.UserId).First(&user)
+	tx.Preload("UserChart").Where("id = ?", chart.UserId).First(&user)
 
 	finalToken := chart.Token + userChart.Token
 	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).Updates(UserChart{Token: finalToken})
 
-	tx.Model(&User{}).Where("userId = ?", chart.UserId).Updates(User{FreeCount: user.FreeCount - 1})
+	tx.Model(&User{}).Where("id = ?", chart.UserId).Updates(User{FreeCount: user.FreeCount - 1})
 
 	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).UpdateColumn("freeCount", gorm.Expr("freeCount - ?", 1))
 
