@@ -27,7 +27,7 @@ WORKDIR /
 
 # Copy our static executable.
 COPY --from=builder /go/main /go/main
-COPY public /go/public
+#COPY public /go/public
 
 ENV PORT 8888
 ENV GIN_MODE release
