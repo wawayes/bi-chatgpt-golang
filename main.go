@@ -3,10 +3,8 @@ package main
 import (
 	"github.com/robfig/cron"
 	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
-	"github.com/wawayes/bi-chatgpt-golang/pkg/setting"
 	"github.com/wawayes/bi-chatgpt-golang/routers"
 	"log"
-	"net/http"
 	"time"
 )
 
@@ -31,9 +29,9 @@ import (
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	router := routers.InitRouter()
-	go func() {
-		log.Println(http.ListenAndServe(setting.Addr, nil))
-	}()
+	//go func() {
+	//	log.Println(http.ListenAndServe("http://localhost", nil))
+	//}()
 	err := router.Run(":8888")
 	if err != nil {
 		logx.Info("启动成功。。。")

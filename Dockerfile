@@ -1,39 +1,31 @@
-############################
-# STEP 1 build executable binary
-############################
-FROM golang:alpine AS builder
-# Install git.
-# Git is required for fetching the dependencies.
-RUN apk update && apk add --no-cache 'git=~2'
+# 基础镜像
+FROM golang:1.20-alpine3.18 AS builder
 
-# Install dependencies
-ENV GO111MODULE=on
-WORKDIR $GOPATH/src/packages/goginapp/
+# 设置工作目录
+WORKDIR /app
+
+# 设置代理
+RUN go env -w GO111MODULE=on
+RUN go env -w GOPROXY=https://goproxy.cn,direct
+
+# 复制go.mod和go.sum文件并下载依赖项
+COPY go.mod go.sum ./
+RUN go mod tidy
+
+# 复制所有文件到工作目录
 COPY . .
 
-# Fetch dependencies.
-# Using go get.
-RUN go get -d -v
+# 构建应用程序
+RUN go build -o myapp
 
-# Build the binary.
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/main .
+# 使用轻量级基础镜像
+FROM alpine:3.14
 
-############################
-# STEP 2 build a small image
-############################
-FROM alpine:3
+# 设置工作目录
+WORKDIR /app
 
-WORKDIR /
+# 从builder阶段复制构建的应用程序
+COPY --from=builder /app/myapp .
 
-# Copy our static executable.
-COPY --from=builder /go/main /go/main
-#COPY public /go/public
-
-ENV PORT 8888
-ENV GIN_MODE release
-EXPOSE 8888
-
-WORKDIR /go
-
-# Run the Go Gin binary.
-ENTRYPOINT ["/go/main"]
+# 运行应用程序
+CMD ["./myapp"]

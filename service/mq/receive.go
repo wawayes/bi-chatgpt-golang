@@ -7,18 +7,18 @@ import (
 
 func ReceiveFromRabbitMQ() {
 	conn, err := amqp.Dial("amqp://admin:admin@localhost:5672")
-	failOnError(err, "Failed to connect to rabbitmq")
+	FailOnError(err, "Failed to connect to rabbitmq")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	FailOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare("hello", false, false, false, false, nil)
-	failOnError(err, "Failed to declare a queue")
+	FailOnError(err, "Failed to declare a queue")
 
 	msg, err := ch.Consume(q.Name, "", true, false, false, false, nil)
-	failOnError(err, "Failed to register a consumer")
+	FailOnError(err, "Failed to register a consumer")
 
 	var forever chan struct{}
 

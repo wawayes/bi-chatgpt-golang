@@ -1,13 +1,14 @@
-package mq
+package main
 
 import (
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
+	"log"
+	"os"
 	"time"
 )
 
-func SendToRabbitMQ() {
+func main() {
 	// 连接rabbitmq
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	FailOnError(err, "Failed to connect to RabbitMQ")
@@ -19,23 +20,24 @@ func SendToRabbitMQ() {
 	defer ch.Close()
 
 	// 声明队列
-	q, err := ch.QueueDeclare("hello", false, false, false, false, nil)
+	q, err := ch.QueueDeclare("task_queue", true, false, false, false, nil)
 	FailOnError(err, "Failed to declare a queue")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	// cancelFunc 告诉操作放弃该工作，不会等待工作停止
 	defer cancel()
 
-	body := "hello world"
-
-	err = ch.PublishWithContext(ctx, "", q.Name, false, false, amqp.Publishing{ContentType: "text/plain", Body: []byte(body)})
+	// 从命令行中获取字符串
+	body := bodyFrom(os.Args)
+	err = ch.PublishWithContext(ctx,
+		"",
+		q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(body),
+		})
 	FailOnError(err, "Failed to publish a message")
-
-	logx.Info("[x] Sent : " + body)
-
-}
-
-func FailOnError(err error, msg string) {
-	if err != nil {
-		logx.Error(err.Error() + ": " + msg)
-	}
+	log.Printf(" [x] Sent %s ", body)
 }
