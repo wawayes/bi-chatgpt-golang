@@ -1,0 +1,18 @@
+2023/07/21 15:56:59 Binding queue amq.gen-Zfu2FAkH9G56lT06dqLiKw to exchange logs_direct with routing key -
+2023/07/21 15:56:59  [*] Waiting for logs. To exit press CTRL+C
+ to exchange logs_direct with routing key -
+2023/07/21 15:56:59  [*] Waiting for logs. To exit press CTRL+C
+2023/07/21 15:58:20 Binding queue amq.gen-72NGKDecXRx_UhpesenB7g to exchange logs_direct with routing key warning
+2023/07/21 15:58:20 Binding queue amq.gen-72NGKDecXRx_UhpesenB7g to exchange logs_direct with routing key error
+2023/07/21 15:58:20  [*] Waiting for logs. To exit press CTRL+C
+2023/07/21 15:59:09 Binding queue amq.gen-kTTiRQ6OAKe12v6MpvRxPw to exchange logs_direct with routing key info
+2023/07/21 15:59:09 Binding queue amq.gen-kTTiRQ6OAKe12v6MpvRxPw to exchange logs_direct with routing key warning
+2023/07/21 15:59:09 Binding queue amq.gen-kTTiRQ6OAKe12v6MpvRxPw to exchange logs_direct with routing key error
+2023/07/21 15:59:09  [*] Waiting for logs. To exit press CTRL+C
+2023/07/21 15:59:42  [x] Sent Run. Run. Or it will explode.
+2023/07/21 15:59:42  [x] Run. Run. Or it will explode.
+2023/07/21 15:59:42  [x] Run. Run. Or it will explode.
+2023/07/21 16:00:18 Binding queue amq.gen-gG99gOlKJGctmigGxIVs4w to exchange logs_direct with routing key error
+2023/07/21 16:00:18  [*] Waiting for logs. To exit press CTRL+C
+2023/07/21 16:00:28  [x] Sent Run. Run. Or it will explode.
+2023/07/21 16:00:28  [x] Run. Run. Or it will explode.
