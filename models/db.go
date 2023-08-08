@@ -26,7 +26,7 @@ func init() {
 	//dbName = sec.Key("NAME").String()
 
 	BI_DB, err = gorm.Open(mysql.New(mysql.Config{
-		DSN: "root:rootroot@tcp(localhost:3306)/bi_db?charset=utf8&parseTime=True&loc=Local", // DSN data source name
+		DSN: "root:123456@tcp(localhost:3306)/bi_db?charset=utf8&parseTime=True&loc=Local", // DSN data source name
 		//DSN:                       fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", dbUser, dbPassword, path, dbName),
 		SkipInitializeWithVersion: false, // 根据当前 MySQL 版本自动配置
 	}), &gorm.Config{

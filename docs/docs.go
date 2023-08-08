@@ -25,7 +25,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/chart/gen": {
+        "/chart/all_list": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -36,28 +36,78 @@ const docTemplate = `{
                 "tags": [
                     "ChartApi"
                 ],
-                "summary": "Generate a chart",
+                "summary": "ListAllChart",
+                "parameters": [
+                    {
+                        "description": "查询请求参数",
+                        "name": "ChartQueryRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ChartQueryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/response.BiResp"
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/chart/gen": {
+            "post": {
+                "description": "通过上传文件和发送请求生成图表",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ChartApi"
+                ],
+                "summary": "生成图表",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "登录请求参数",
+                        "description": "要上传的文件",
                         "name": "file",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "name": "chartType",
-                        "in": "formData"
+                        "description": "生成图表的目标",
+                        "name": "goal",
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "string",
-                        "name": "goal",
-                        "in": "formData"
+                        "description": "图表类型",
+                        "name": "chartType",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "0": {
+                    "200": {
                         "description": "成功",
                         "schema": {
                             "$ref": "#/definitions/response.BiResp"
@@ -199,6 +249,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "List",
+                "responses": {
+                    "0": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40002": {
+                        "description": "参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    },
+                    "40003": {
+                        "description": "系统错误",
+                        "schema": {
+                            "$ref": "#/definitions/r.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "consumes": [
@@ -255,7 +339,7 @@ const docTemplate = `{
                 "tags": [
                     "UserApi"
                 ],
-                "summary": "List",
+                "summary": "Logout",
                 "responses": {
                     "0": {
                         "description": "成功",
@@ -494,8 +578,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8888",
-	BasePath:         "/api/v1",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "BI Pro API",
 	Description:      "This is a sample server celler server.",

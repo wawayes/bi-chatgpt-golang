@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/pandodao/tokenizer-go"
 	"github.com/wawayes/bi-chatgpt-golang/common/requests"
 	"github.com/wawayes/bi-chatgpt-golang/common/response"
@@ -14,10 +13,8 @@ import (
 	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
 	"github.com/xuri/excelize/v2"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"reflect"
 	"strings"
 )
@@ -147,11 +144,6 @@ func Xlsx2Data(file multipart.File) (data string, err error) {
 //}
 
 func GetChatResp(c *gin.Context, info string, goal string, chartType string) (res response.BiResp, err error) {
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	systemPrompt := "你是一个高级数据分析师和前端开发专家，接下来我按照以下格式给你提供内容：" +
 		"\n分析需求：{分析需求和目标}\n原始数据：{原始数据}\nEcharts图表类型：{Echarts图表类型}" +
 		"\n请根据这两部分内容按照以下指定格式生成内容（不要输出任何多余的开头或者结尾或者注释）" +
@@ -189,14 +181,14 @@ func GetChatResp(c *gin.Context, info string, goal string, chartType string) (re
 			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
 			return
 		}
-		req, err := http.NewRequest("POST", os.Getenv("BASE_URL"), bytes.NewBuffer(data))
+		req, err := http.NewRequest("POST", "https://api.openai-proxy.com/v1/chat/completions", bytes.NewBuffer(data))
 		if err != nil {
 			logx.Warning(err.Error())
 			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
 			return
 		}
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
+		req.Header.Set("Authorization", "Bearer "+"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")
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
@@ -309,8 +301,3 @@ func ListAllChart(chartQueryRequest *requests.ChartQueryRequest) (listAllChart [
 	}
 	return listAllChart, nil
 }
-
-// AddChart 添加一条chart记录
-//func AddChart(addRequest *requests.AddRequest) (bool, error) {
-//
-//}
