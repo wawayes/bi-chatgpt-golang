@@ -1,11 +1,8 @@
 package main
 
 import (
-	"github.com/robfig/cron"
 	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
 	"github.com/wawayes/bi-chatgpt-golang/routers"
-	"log"
-	"time"
 )
 
 //	@title			BI Pro API
@@ -19,9 +16,6 @@ import (
 
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-
-//	@host		localhost:8888
-//	@BasePath	/api/v1
 
 //	@securityDefinitions.basic	BasicAuth
 
@@ -38,23 +32,4 @@ func main() {
 		return
 	}
 	logx.Error("启动失败。。。")
-	c := cron.New()
-	c.AddFunc("* * * * * *", func() {
-		log.Println("Run models.CleanAllTag...")
-		//models.CleanAllTag()
-	})
-	c.AddFunc("* * * * * *", func() {
-		log.Println("Run models.CleanAllArticle...")
-		//models.CleanAllArticle()
-	})
-
-	c.Start()
-
-	t1 := time.NewTimer(time.Second * 10)
-	for {
-		select {
-		case <-t1.C:
-			t1.Reset(time.Second * 10)
-		}
-	}
 }

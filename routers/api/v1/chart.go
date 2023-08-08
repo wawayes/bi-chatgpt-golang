@@ -15,16 +15,18 @@ import (
 
 // GenChart godoc
 //
-//	@Summary	Generate a chart
-//	@Produce	json
-//	@Tags		ChartApi
-//	@Param		file		formData	file				true	"登录请求参数"
-//	@Param		genRequest	formData	requests.GenRequest	true	"生成请求"
-//	@Accept		multipart/form-data
-//	@Success	0		{object}	response.BiResp	"成功"
-//	@Failure	40002	{object}	r.Response		"参数错误"
-//	@Failure	40003	{object}	r.Response		"系统错误"
-//	@Router		/chart/gen [post]
+//	@Summary		生成图表
+//	@Description	通过上传文件和发送请求生成图表
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Tags			ChartApi
+//	@Param			file		formData	file			true	"要上传的文件"
+//	@Param			goal		formData	string			true	"生成图表的目标"
+//	@Param			chartType	formData	string			true	"图表类型"
+//	@Success		200			{object}	response.BiResp	"成功"
+//	@Failure		40002		{object}	r.Response		"参数错误"
+//	@Failure		40003		{object}	r.Response		"系统错误"
+//	@Router			/chart/gen [post]
 func GenChart(c *gin.Context) {
 	multipartFile, err := c.FormFile("file")
 	if err != nil {
@@ -105,6 +107,17 @@ func ListChart(c *gin.Context) {
 	c.JSON(http.StatusOK, r.OK.WithData(listChart))
 }
 
+// ListAllChart godoc
+//
+//	@Summary	ListAllChart
+//	@Produce	json
+//	@Tags		ChartApi
+//	@Param		ChartQueryRequest	body	requests.ChartQueryRequest	true	"查询请求参数"
+//	@Accept		multipart/form-data
+//	@Success	0		{object}	response.BiResp	"成功"
+//	@Failure	40002	{object}	r.Response		"参数错误"
+//	@Failure	40003	{object}	r.Response		"系统错误"
+//	@Router		/chart/all_list [post]
 func ListAllChart(c *gin.Context) {
 	var req requests.ChartQueryRequest
 	err := c.BindJSON(&req)

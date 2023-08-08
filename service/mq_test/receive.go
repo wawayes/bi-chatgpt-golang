@@ -1,4 +1,4 @@
-package mq
+package mq_test
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"

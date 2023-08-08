@@ -119,7 +119,7 @@ func Logout(c *gin.Context) {
 //	@Success	0		{object}	r.Response	"成功"
 //	@Failure	40002	{object}	r.Response	"参数错误"
 //	@Failure	40003	{object}	r.Response	"系统错误"
-//	@Router		/user/logout [get]
+//	@Router		/user/list [get]
 func List(c *gin.Context) {
 	var req requests.Page
 	err := c.BindJSON(&req)
