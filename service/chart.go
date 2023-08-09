@@ -1,24 +1,19 @@
 package service
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"mime/multipart"
+
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/pandodao/tokenizer-go"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/wawayes/bi-chatgpt-golang/common/constant"
 	"github.com/wawayes/bi-chatgpt-golang/common/requests"
 	"github.com/wawayes/bi-chatgpt-golang/common/response"
 	"github.com/wawayes/bi-chatgpt-golang/models"
 	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
 	"github.com/xuri/excelize/v2"
-	"io"
-	"log"
-	"mime/multipart"
-	"net/http"
-	"os"
-	"strings"
 )
 
 // Xlsx2Data 读取xlsx文件数据
@@ -50,227 +45,105 @@ func Xlsx2Data(file multipart.File) (data string, err error) {
 }
 
 // GetChatResp 获取ChatGPT响应
-func GetChatResp(c *gin.Context, info string, goal string, chartType string) (res response.BiResp, err error) {
-	err = godotenv.Load()
+func GetChatResp(c *gin.Context, newChart models.Chart) (res response.BiResp, err error) {
+	// 建立连接
+	conn, err := amqp.Dial(constant.MQUrl)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("dial rabbitmq error: %s\n", err)
+		return
 	}
-	var chatReq requests.ChatRequest
-	systemPrompt := "你是一个高级数据分析师和前端开发专家，接下来我按照以下格式给你提供内容：" +
-		"\n分析需求：{分析需求和目标}\n原始数据：{原始数据}\nEcharts图表类型：{Echarts图表类型}" +
-		"\n请根据这两部分内容按照以下指定格式生成内容（不要输出任何多余的开头或者结尾或者注释）" +
-		"\n【【【【【\n{前端的Echarts V5的option配置对象json代码，合理地将数据进行可视化，不要生成多余的开头结尾或者任何注释}" +
-		"\n【【【【【\n{明确的数据结论，越详细越好，不要生成任何多余废话或者对实质结论无用的内容}"
-	prompt := "原始数据：" + info + "\n分析需求和目标：" + goal + ", Echarts图表类型：" + chartType
-	chatReq.Model = "gpt-3.5-turbo"
-	chatReq.Messages = []requests.Message{
-		{Role: "system", Content: systemPrompt},
-		{Role: "user", Content: prompt},
-	}
-	data, err := json.Marshal(chatReq)
-	if err != nil {
-		return response.BiResp{}, err
-	}
-	req, err := http.NewRequest("POST", os.Getenv("BASE_URL"), bytes.NewBuffer(data))
-	if err != nil {
-		return response.BiResp{}, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
-	client := &http.Client{}
-	go func() {
+	defer conn.Close()
 
-	}()
-	resp, err := client.Do(req)
+	// 创建channel
+	ch, err := conn.Channel()
 	if err != nil {
-		fmt.Println("Error sending request:", err)
+		fmt.Printf("create channel error: %s\n", err)
+		return
+	}
+	defer ch.Close()
+
+	// 声明交换机
+	if err = ch.ExchangeDeclare(
+		constant.BiExchangeName, // name
+		"direct",                // type
+		true,                    // durable
+		false,                   // auto-deleted
+		false,                   // internal
+		false,                   // no-wait
+		nil,                     // arguments
+	); err != nil {
+		fmt.Printf("declare exchange error: %s\n", err)
+		return
+	}
+
+	// 声明队列
+	q, err := ch.QueueDeclare(
+		constant.BiQueueName, // name
+		true,                 // durable
+		false,                // delete when unused
+		false,                // exclusive
+		false,                // no-wait
+		nil,                  // arguments
+	)
+	if err != nil {
+		fmt.Printf("declare queue error: %s\n", err)
+		return
+	}
+
+	// 绑定队列到交换机
+	if err = ch.QueueBind(
+		q.Name,                  // queue name
+		constant.BiRoutingKey,   // routing key
+		constant.BiExchangeName, // exchange
+		false,
+		nil); err != nil {
+		fmt.Printf("bind queue error: %s\n", err)
+		return
+	}
+
+	// 创建消费者
+	consumer := NewBiMessageConsumer(ch)
+	logx.Info(fmt.Sprintf("Channel信息: %v", ch))
+	go consumer.Consume()
+
+	prompt := BuildUserInput(&newChart)
+	content, err := DoChat(prompt)
+	if err != nil {
 		return response.BiResp{}, err
 	}
-	defer resp.Body.Close()
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return response.BiResp{}, err
-	}
-	var chatResp response.ChatCompletionResponse
-	err = json.Unmarshal(respBody, &chatResp)
-	if err != nil {
-		return response.BiResp{}, err
-	}
-	content := chatResp.Choices[0].Message.Content
 	var biResp response.BiResp
-	delimiter := "【【【【【\n"
-	parts := strings.Split(content, delimiter)
-	if len(parts) < 3 {
-		logx.Warning("AI生成结果错误，我最近有种大模型不行了的感觉。。")
-		return response.BiResp{}, err
-	}
-	for i, part := range parts {
-		if i == 1 {
-			biResp.GenChart = part
-		}
-		if i == 2 {
-			biResp.GenResult = part
-		}
-	}
 	//var userService *UserService
 	// 计算token值
-	OriginStr := systemPrompt + prompt + content
+	OriginStr := SystemPrompt + prompt + content
 	t := tokenizer.MustCalToken(OriginStr)
-
 	userService := &UserService{}
 	current, _ := userService.Current(c)
-	chart := &models.Chart{
-		UserId:    current.ID,
-		Data:      info,
-		Goal:      goal,
-		ChartType: chartType,
-		GenChart:  biResp.GenChart,
-		GenResult: biResp.GenResult,
-		Token:     t,
-	}
-	err = models.BI_DB.Model(&models.Chart{}).Select("goal", "chartType", "genChart", "genResult", "userId", "token").Create(&chart).Error
-	if err != nil {
-		logx.Warning(err.Error())
-		return response.BiResp{}, err
-	}
+	newChart.UserId = current.ID
+	newChart.Token = t
 	var user models.User
-	if err := models.BI_DB.Model(&user).Where("id = ?", current.ID).First(&user).Error; err != nil {
+	if err = models.BI_DB.Model(&user).Where("id = ?", current.ID).First(&user).Error; err != nil {
 		return response.BiResp{}, errors.New("查找当前用户失败")
 	}
 	user.FreeCount--
 	if err := models.BI_DB.Save(&user).Error; err != nil {
 		return response.BiResp{}, errors.New("FreeCount--异常")
 	}
+	var chartInfo *models.Chart
+	models.BI_DB.Model(&chartInfo).Select("*").Where("id = ?", newChart.ID).First(&chartInfo)
+	biResp.GenResult = chartInfo.GenResult
+	biResp.GenChart = chartInfo.GenChart
 	return biResp, nil
 }
 
-//func GetChatResp(c *gin.Context, info string, goal string, chartType string) (res response.BiResp, err error) {
-//	systemPrompt := "你是一个高级数据分析师和前端开发专家，接下来我按照以下格式给你提供内容：" +
-//		"\n分析需求：{分析需求和目标}\n原始数据：{原始数据}\nEcharts图表类型：{Echarts图表类型}" +
-//		"\n请根据这两部分内容按照以下指定格式生成内容（不要输出任何多余的开头或者结尾或者注释）" +
-//		"\n【【【【【\n{前端的Echarts V5的option配置对象json代码，合理地将数据进行可视化，不要生成多余的开头结尾或者任何注释}" +
-//		"\n【【【【【\n{明确的数据结论，越详细越好，不要生成任何多余废话或者对实质结论无用的内容}"
-//	prompt := "原始数据：" + info + "\n分析需求和目标：" + goal + ", Echarts图表类型：" + chartType
-//
-//	userService := &UserService{}
-//	current, _ := userService.Current(c)
-//	chart := &models.Chart{
-//		UserId: current.ID,
-//		Status: "running",
-//	}
-//	err = models.BI_DB.Model(&models.Chart{}).Select("userId", "status").Create(&chart).Error
-//	if err != nil {
-//		logx.Warning(err.Error())
-//		return
-//	}
-//
-//	// 创建一个无缓冲的channel，用于在goroutine之间传递ChatGPT的响应结果
-//	respChan := make(chan response.ChatCompletionResponse)
-//
-//	// 启动goroutine发送ChatGPT请求
-//	go func() {
-//		var chatReq requests.ChatRequest
-//
-//		chatReq.Model = "gpt-3.5-turbo"
-//		chatReq.Messages = []requests.Message{
-//			{Role: "system", Content: systemPrompt},
-//			{Role: "user", Content: prompt},
-//		}
-//		data, err := json.Marshal(chatReq)
-//		if err != nil {
-//			logx.Warning(err.Error())
-//			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
-//			return
-//		}
-//		req, err := http.NewRequest("POST", "https://api.openai-proxy.com/v1/chat/completions", bytes.NewBuffer(data))
-//		if err != nil {
-//			logx.Warning(err.Error())
-//			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
-//			return
-//		}
-//		req.Header.Set("Content-Type", "application/json")
-//		req.Header.Set("Authorization", "Bearer "+"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")
-//		client := &http.Client{}
-//		resp, err := client.Do(req)
-//		if err != nil {
-//			logx.Warning(fmt.Sprintf("Error sending request%s", err.Error()))
-//			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
-//			return
-//		}
-//		defer resp.Body.Close()
-//		respBody, err := io.ReadAll(resp.Body)
-//		if err != nil {
-//			logx.Warning(err.Error())
-//			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
-//			return
-//		}
-//		var chatResp response.ChatCompletionResponse
-//		err = json.Unmarshal(respBody, &chatResp)
-//		if err != nil {
-//			logx.Warning(err.Error())
-//			respChan <- response.ChatCompletionResponse{} // 发送空响应到channel，表示出错
-//			return
-//		}
-//		respChan <- chatResp // 发送ChatGPT的响应到channel
-//	}()
-//
-//	// 从channel接收ChatGPT的响应结果
-//	chatResp := <-respChan
-//	if reflect.DeepEqual(chatResp, response.ChatCompletionResponse{}) {
-//		logx.Warning("AI生成结果错误，我最近有种大模型不行了的感觉。。")
-//		return response.BiResp{}, err
-//	}
-//
-//	content := chatResp.Choices[0].Message.Content
-//	var biResp response.BiResp
-//	delimiter := "【【【【【\n"
-//	parts := strings.Split(content, delimiter)
-//	if len(parts) < 3 {
-//		logx.Warning("AI生成结果错误，我最近有种大模型不行了的感觉。。")
-//		return response.BiResp{}, err
-//	}
-//	for i, part := range parts {
-//		if i == 1 {
-//			biResp.GenChart = part
-//		}
-//		if i == 2 {
-//			biResp.GenResult = part
-//		}
-//	}
-//
-//	// 启动goroutine将结果存储到数据库
-//	go func() {
-//		//var userService *UserService
-//		// 计算token值
-//		OriginStr := systemPrompt + prompt + content
-//		t := tokenizer.MustCalToken(OriginStr)
-//
-//		chart.Data = info
-//		chart.Goal = goal
-//		chart.ChartType = chartType
-//		chart.Status = "succeed"
-//		chart.GenChart = biResp.GenChart
-//		chart.GenResult = biResp.GenResult
-//		chart.Token = t
-//		err = models.BI_DB.Model(&models.Chart{}).Where("id = ?", chart.ID).Updates(chart).Error
-//		if err != nil {
-//			logx.Warning(err.Error())
-//			return
-//		}
-//		var user models.User
-//		if err := models.BI_DB.Model(&user).Where("id = ?", current.ID).First(&user).Error; err != nil {
-//			logx.Warning("查找当前用户失败")
-//			return
-//		}
-//		user.FreeCount--
-//		if err := models.BI_DB.Save(&user).Error; err != nil {
-//			logx.Warning("FreeCount--异常")
-//			return
-//		}
-//	}()
-//
-//	return biResp, nil
-//}
+// GetChartById 根据id获取Chart
+func GetChartById(chartId int) (*models.Chart, error) {
+	var chartInfo models.Chart
+	if err := models.BI_DB.Model(&chartInfo).Select("*").Where("id = ?", chartId).First(&chartInfo).Error; err != nil {
+		logx.Info("根据Id查询Chart失败: " + err.Error())
+		return nil, err
+	}
+	return &chartInfo, nil
+}
 
 // ListChart 分页查询当前用户图表
 func ListChart(c *gin.Context, chartQueryRequest *requests.ChartQueryRequest) ([]models.Chart, error) {

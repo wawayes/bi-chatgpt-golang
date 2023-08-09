@@ -4,15 +4,16 @@ import "gorm.io/gorm"
 
 type Chart struct {
 	Model
-	Goal      string `json:"goal" gorm:"column:goal"`
-	Name      string `json:"name" gorm:"column:name"`
-	Data      string `json:"data" gorm:"column:chartData"`
-	ChartType string `json:"chartType" gorm:"column:chartType"`
-	Status    string `json:"status" gorm:"column:status"`
-	Token     int    `json:"token" gorm:"column:token"`
-	GenChart  string `json:"genChart" gorm:"column:genChart"`
-	GenResult string `json:"genResult" gorm:"column:genResult"`
-	UserId    int    `json:"userId" gorm:"column:userId"`
+	Goal        string `json:"goal" gorm:"column:goal"`
+	Name        string `json:"name" gorm:"column:name"`
+	Data        string `json:"data" gorm:"column:chartData"`
+	ChartType   string `json:"chartType" gorm:"column:chartType"`
+	Status      string `json:"status" gorm:"column:status"`
+	ExecMessage string `json:"execMessage" gorm:"column:execMessage"`
+	Token       int    `json:"token" gorm:"column:token"`
+	GenChart    string `json:"genChart" gorm:"column:genChart"`
+	GenResult   string `json:"genResult" gorm:"column:genResult"`
+	UserId      int    `json:"userId" gorm:"column:userId"`
 }
 
 func (chart *Chart) TableName() string {
@@ -20,25 +21,15 @@ func (chart *Chart) TableName() string {
 	return "chart"
 }
 
-//func (chart *Chart) AfterCreate(tx *gorm.DB) (err error) {
-//	var userChart UserChart
-//	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).First(&userChart)
-//
-//	var user User
-//	tx.Model(&User{}).Where("userId = ?", chart.UserId).First(&user).Update("freeCount", user.FreeCount-1)
-//	freeCount := user.FreeCount
-//
-//	finalToken := chart.Token + userChart.Token
-//	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).UpdateColumn("token", finalToken).UpdateColumn("freeCount", freeCount)
-//	return nil
-//}
-
 func (chart *Chart) AfterUpdate(tx *gorm.DB) (err error) {
 	var userChart UserChart
 	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).First(&userChart)
 
+	// var user User
+	// tx.Preload("UserChart").Where("id = ?", chart.UserId).First(&user)
+
 	var user User
-	tx.Preload("UserChart").Where("id = ?", chart.UserId).First(&user)
+	tx.Where("id = ?", chart.UserId).First(&user)
 
 	finalToken := chart.Token + userChart.Token
 	tx.Model(&UserChart{}).Where("userId = ?", chart.UserId).Updates(UserChart{Token: finalToken})

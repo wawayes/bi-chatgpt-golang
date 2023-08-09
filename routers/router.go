@@ -1,6 +1,8 @@
 package routers
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -8,7 +10,6 @@ import (
 	"github.com/wawayes/bi-chatgpt-golang/middleware/cors"
 	"github.com/wawayes/bi-chatgpt-golang/middleware/jwt"
 	v1 "github.com/wawayes/bi-chatgpt-golang/routers/api/v1"
-	"log"
 )
 
 func InitRouter() *gin.Engine {
@@ -21,7 +22,6 @@ func InitRouter() *gin.Engine {
 	//	c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
 	//	c.Next()
 	//})
-
 	// 日志格式化输出到控制台
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
 		log.Printf("endpoint %v %v %v %v\n", httpMethod, absolutePath, handlerName, nuHandlers)

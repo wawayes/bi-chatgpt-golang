@@ -1,16 +1,24 @@
 package v1
 
 import (
-	"github.com/duke-git/lancet/v2/strutil"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/wawayes/bi-chatgpt-golang/common/requests"
-	"github.com/wawayes/bi-chatgpt-golang/pkg/r"
-	"github.com/wawayes/bi-chatgpt-golang/service"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
+
+	"github.com/duke-git/lancet/v2/strutil"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	amqp "github.com/rabbitmq/amqp091-go"
+
+	"github.com/wawayes/bi-chatgpt-golang/common/constant"
+	"github.com/wawayes/bi-chatgpt-golang/common/requests"
+	"github.com/wawayes/bi-chatgpt-golang/models"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/logx"
+	"github.com/wawayes/bi-chatgpt-golang/pkg/r"
+	"github.com/wawayes/bi-chatgpt-golang/service"
 )
 
 // GenChart godoc
@@ -28,6 +36,63 @@ import (
 //	@Failure		40003		{object}	r.Response		"系统错误"
 //	@Router			/chart/gen [post]
 func GenChart(c *gin.Context) {
+	// 建立连接
+	conn, err := amqp.Dial(constant.MQUrl)
+	if err != nil {
+		fmt.Printf("dial rabbitmq error: %s\n", err)
+		return
+	}
+	logx.Info("连接MQ成功")
+	defer conn.Close()
+
+	// 创建channel
+	ch, err := conn.Channel()
+	if err != nil {
+		fmt.Printf("create channel error: %s\n", err)
+		return
+	}
+	logx.Info("创建channel成功")
+	defer ch.Close()
+
+	// 声明交换机
+	if err = ch.ExchangeDeclare(
+		constant.BiExchangeName, // name
+		"direct",                // type
+		true,                    // durable
+		false,                   // auto-deleted
+		false,                   // internal
+		false,                   // no-wait
+		nil,                     // arguments
+	); err != nil {
+		fmt.Printf("declare exchange error: %s\n", err)
+		return
+	}
+	logx.Info("声明交换机成功")
+	// 声明队列
+	q, err := ch.QueueDeclare(
+		constant.BiQueueName, // name
+		true,                 // durable
+		false,                // delete when unused
+		false,                // exclusive
+		false,                // no-wait
+		nil,                  // arguments
+	)
+	if err != nil {
+		fmt.Printf("declare queue error: %s\n", err)
+		return
+	}
+	logx.Info("声明队列成功")
+	// 绑定队列到交换机
+	if err = ch.QueueBind(
+		q.Name,                  // queue name
+		constant.BiRoutingKey,   // routing key
+		constant.BiExchangeName, // exchange
+		false,
+		nil); err != nil {
+		fmt.Printf("bind queue error: %s\n", err)
+		return
+	}
+
 	multipartFile, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusOK, r.FAIL.WithMsg("获取文件失败"))
@@ -73,10 +138,30 @@ func GenChart(c *gin.Context) {
 		c.JSON(http.StatusOK, r.FAIL.WithMsg("文件读取数据错误"))
 		return
 	}
-	res, err := service.GetChatResp(c, data, goal, chartType)
-	if err != nil || strutil.IsBlank(res.GenChart) || strutil.IsBlank(res.GenResult) {
-		c.JSON(http.StatusOK, r.FAIL.WithMsg("我总感觉大模型越来越傻了,别生气,要不再试一次"))
-		return
+	var userService service.UserService
+	currentUser, err := userService.Current(c)
+	if err != nil {
+		logx.Info("获取当前用户失败")
+	}
+	newChart := models.Chart{
+		Goal:      goal,
+		Data:      data,
+		ChartType: chartType,
+		Status:    "wait",
+		UserId:    currentUser.ID,
+	}
+	if err = models.BI_DB.Model(&newChart).Create(&newChart).Error; err != nil {
+		logx.Warning("保存newChart失败: " + err.Error())
+	}
+	producer := service.NewBiMessageProducer(ch)
+	err = producer.Publish(c, strconv.FormatInt(int64(newChart.ID), 10))
+	if err != nil {
+		logx.Warning("发布消息失败：" + err.Error())
+		c.JSON(http.StatusOK, r.SYSTEM_ERROR)
+	}
+	res, err := service.GetChatResp(c, newChart)
+	if err != nil {
+		logx.Warning("生成响应失败" + err.Error())
 	}
 	c.JSON(http.StatusOK, r.OK.WithData(res))
 }
