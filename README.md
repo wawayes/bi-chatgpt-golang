@@ -1,8 +1,9 @@
+# 更新：已加入RabbitMQ
+
 Hello GoLang!
 
 
 2023年7月9日00:30
-
 
 
 BI-Golang-ChatGPT
